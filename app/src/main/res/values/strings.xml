@@ -45,4 +45,8 @@
     </string>
     <string name="bild_aufnehmen">Bild Aufnehmen</string>
     <string name="video_aufnehmen">Video Aufnehmen</string>
+    <string name="l_schen">Löschen</string>
+    <string name="akzeptieren">Akzeptieren</string>
+    <string name="imageshow">ImageShow</string>
+    <string name="show_image">Show Image</string>
 </resources>

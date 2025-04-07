@@ -27,7 +27,6 @@
             android:layout_marginTop="64dp"
             android:gravity="center"
             android:orientation="vertical">
-#
 
             <FrameLayout
                 android:layout_width="300dp"
@@ -48,6 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="25dp"
+                android:backgroundTint="@color/primaryBlue"
                 android:text="@string/bild_aufnehmen"/>
 
             <Button
@@ -56,6 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="25dp"
+                android:backgroundTint="@color/primaryBlue"
                 android:text="@string/video_aufnehmen"/>
 
         </LinearLayout>

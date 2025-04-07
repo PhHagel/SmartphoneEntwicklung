@@ -2,7 +2,9 @@ package com.philipp.dv_projekt;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.common.util.concurrent.ListenableFuture;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Button bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
+
+
 
         bBildAufnehmen.setOnClickListener(this);
 
@@ -120,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                         Toast.makeText(MainActivity.this, "📸 Foto gespeichert!", Toast.LENGTH_SHORT).show();
                         Log.d("MainActivity", "✅ Foto gespeichert unter: " + photoFile.getAbsolutePath());
+                        showPhoto(photoFile);
                     }
 
                     @Override
@@ -130,6 +136,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         );
     }
 
+    private void showPhoto(File photoFile) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.layout_photo_preview);
+
+        ImageView imageCheckView = dialog.findViewById(R.id.imageCheckView);
+        Button imageDeleteBtn = dialog.findViewById(R.id.imageDeleteBtn);
+        Button imageAcceptBtn = dialog.findViewById(R.id.imageAcceptBtn);
+
+        imageDeleteBtn.setOnClickListener(v -> {
+            if (photoFile.delete()) {
+                Toast.makeText(this, "❌ Foto gelöscht!", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            } else {
+                Toast.makeText(this, "❌ Fehler beim Löschen des Fotos!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        imageAcceptBtn.setOnClickListener(v -> {
+            Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+            // Hier muss das Bild zum Server gesendet werden
+        });
+
+        imageCheckView.setImageURI(Uri.fromFile(photoFile));
+
+        dialog.show();
+    }
 
 
 }
