@@ -3,13 +3,17 @@ package com.philipp.dv_projekt;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -28,6 +32,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final long TIMEOUT_IN_MILLIS = 15_000;  // Muss noch auf 30_000 gesetzt werden (am ende)
+    private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
+    private Runnable timeoutRunnable;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private PreviewView previewView;
     private ImageCapture imageCapture;
@@ -39,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
 
-
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
         bBildAufnehmen.setOnClickListener(this);
 
@@ -50,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE}, 100);
         }
+
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
@@ -62,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e("MainActivity", "InterruptedException beim Abrufen des CameraProviders", e);
             }
         }, getExecutor());
+
+        startInactivityTimeout();
     }
 
     private Executor getExecutor() {
@@ -164,5 +175,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.show();
     }
 
+    private void startInactivityTimeout() {
+        if (timeoutRunnable != null) {
+            timeoutHandler.removeCallbacks(timeoutRunnable);
+        }
+
+        timeoutRunnable = () -> {
+            Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish(); // Beendet MainActivity
+        };
+
+        timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_IN_MILLIS);
+    }
+
+    private void resetInactivityTimeout() {
+        startInactivityTimeout();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        resetInactivityTimeout(); // Jedes Berühren resettet den Timer
+        return super.dispatchTouchEvent(ev);
+    }
 
 }

@@ -1,65 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:background="#F0F4F8"
     tools:context=".MainActivity">
 
-    <FrameLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primaryBlue"
+        android:minHeight="50dp"
+        app:title="Arztpraxis XYZ"
+        app:titleCentered="true"
+        app:titleTextColor="@color/lightBlue"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/primaryBlue"
-            android:minHeight="50dp"
-            app:title="Arztpraxis XYZ"
-            app:titleCentered="true"
-            app:titleTextColor="@color/lightBlue" />
+    <LinearLayout
+        android:id="@+id/contentLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/footer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/infoText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="30dp"
             android:gravity="center"
-            android:orientation="vertical">
+            android:text="@string/dr_cken_sie_bitte_auf_den_knopf_um_sich_zu_identifizieren"
+            android:textAlignment="center"
+            android:textColor="#333333"
+            android:textSize="20sp" />
 
-            <FrameLayout
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:layout_marginTop="25dp"
+            android:background="@color/primaryBlue">
+
+            <androidx.camera.view.PreviewView
+                android:id="@+id/previewView"
                 android:layout_width="300dp"
                 android:layout_height="300dp"
-                android:layout_marginTop="25dp"
-                android:id="@+id/container">
+                android:layout_gravity="center" />
 
-                <androidx.camera.view.PreviewView
-                    android:id="@+id/previewView"
-                    android:layout_width="300dp"
-                    android:layout_height="300dp" />
+        </FrameLayout>
 
-            </FrameLayout>
+        <Button
+            android:id="@+id/bCapture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="25dp"
+            android:backgroundTint="@color/primaryBlue"
+            android:text="@string/bild_aufnehmen"
+            android:textColor="@color/lightBlue" />
+    </LinearLayout>
 
-            <Button
-                android:id="@+id/bCapture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="25dp"
-                android:backgroundTint="@color/primaryBlue"
-                android:text="@string/bild_aufnehmen"/>
+    <TextView
+        android:id="@+id/footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/patienten_terminal_v1_0"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="20dp" />
 
-            <Button
-                android:id="@+id/bRecord"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="25dp"
-                android:backgroundTint="@color/primaryBlue"
-                android:text="@string/video_aufnehmen"/>
-
-        </LinearLayout>
-    </FrameLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
