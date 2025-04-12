@@ -83,21 +83,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void startCameraX(ProcessCameraProvider cameraProvider) {
         cameraProvider.unbindAll();
 
-        // camera Selector use-case
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
                 .build();
 
-        // preview use-case
         Preview preview = new Preview.Builder().build();
 
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
-        // image capture use-case
         imageCapture = new ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                 .build();
-
 
         cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
     }
@@ -158,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         imageDeleteBtn.setOnClickListener(v -> {
             if (photoFile.delete()) {
-                Toast.makeText(this, "❌ Foto gelöscht!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "✅ Foto gelöscht!", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             } else {
                 Toast.makeText(this, "❌ Fehler beim Löschen des Fotos!", Toast.LENGTH_SHORT).show();
@@ -194,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(MainActivity.this, SplashActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            finish(); // Beendet MainActivity
+            finish();
         };
 
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_IN_MILLIS);
@@ -206,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        resetInactivityTimeout(); // Jedes Berühren resettet den Timer
+        resetInactivityTimeout();
         return super.dispatchTouchEvent(ev);
     }
 

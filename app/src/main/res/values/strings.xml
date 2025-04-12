@@ -22,4 +22,5 @@
     <string name="nachname_n_vorname_n_geschlecht_n_geburtsdatum_n_telefonnummer_n_email">Nachname \n Vorname \n Geschlecht \n Geburtsdatum \n Telefonnummer \n Email</string>
     <string name="seite_schlie_en">Seite Schließen</string>
     <string name="klicken_sie_bitte_auf_aufnahme_starten_und_sagen_die_folgenden_daten">Klicken Sie bitte auf Aufnahme starten und sagen die folgenden Daten:</string>
+    <string name="neuer_versuch">Neuer Versuch</string>
 </resources>

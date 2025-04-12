@@ -1,11 +1,15 @@
 package com.philipp.dv_projekt;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -19,7 +23,7 @@ public class RecordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_record); // kannst du ggf. in record_activity.xml umbenennen
+        setContentView(R.layout.activity_record);
 
         startBtn = findViewById(R.id.btn_start_recording);
         stopBtn = findViewById(R.id.btn_stop_recording);
@@ -59,9 +63,19 @@ public class RecordActivity extends AppCompatActivity {
             startBtn.setEnabled(false);
             Toast.makeText(this, "✅ Aufnahme gespeichert unter: " + filePath, Toast.LENGTH_SHORT).show(); // nur zum Testen
 
-            // Hier kannst du den Code hinzufügen, um die Aufnahme zum Server zu senden
+            // Hier soll die Audio zum Server gesendet werden
 
-            // Antwort vom Server mit den Benutzerdaten welche eingetragen werden sollen mit Button akzeptieren und neu versuchen
+            // Hier soll die Serverantwort verarbeitet werden
+
+            String name = "Thomas";
+            String vorname = "Müller";
+            String geschlecht = "männlich";
+            String geburtsdatum = "01.01.2000";
+            String telNr = "0123456789";
+            String email = "asdf@asdf.de";
+
+            showNewUserData("Name: " + name + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
+                    "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telNr + "\nE-Mail: " + email);
         });
 
         closeBtn.setOnClickListener(v -> {
@@ -80,5 +94,37 @@ public class RecordActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    private void showNewUserData(String userDataFromServer) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.layout_new_user);
+
+        TextView textCheckView = dialog.findViewById(R.id.textCheckView);
+        Button userDeleteBtn = dialog.findViewById(R.id.userDeleteBtn);
+        Button userAcceptBtn = dialog.findViewById(R.id.userAcceptBtn);
+
+        userDeleteBtn.setOnClickListener(v -> {
+            File audioFile = new File(filePath);
+            if (audioFile.delete()) {
+                Toast.makeText(this, "✅ Audio gelöscht!", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            } else {
+                Toast.makeText(this, "❌ Fehler beim Löschen der Audio!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        userAcceptBtn.setOnClickListener(v -> {
+            Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+
+            // Hier muss das OK an den Server gesendet werden
+
+
+        });
+
+        textCheckView.setText(userDataFromServer);
+
+        dialog.show();
     }
 }
