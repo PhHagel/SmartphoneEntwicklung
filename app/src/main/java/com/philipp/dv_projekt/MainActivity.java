@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -33,12 +34,13 @@ import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final long TIMEOUT_IN_MILLIS = 15_000;  // Muss noch auf 30_000 gesetzt werden (am ende)
+    private static final long TIMEOUT_IN_MILLIS = 10_000;  // Muss noch auf 30_000 gesetzt werden (am ende)
     private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
     private Runnable timeoutRunnable;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private PreviewView previewView;
     private ImageCapture imageCapture;
+    private MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }, getExecutor());
 
         startInactivityTimeout();
+
+        if (player == null) {
+            player = MediaPlayer.create(MainActivity.this, R.raw.bildaufnehmen);
+            player.start();
+        }
     }
 
     private Executor getExecutor() {
@@ -168,7 +175,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Hier muss das Bild zum Server gesendet werden
 
 
-            // bei serverantwort: nicht erkannt, dann Seite öffnen und timer stoppen
+
+
+            // bei serverantwort: erkannt, aber kein Termin -> Termin vereinbaren
+            // audioausgabe
+
+            // bei serverantwort: erkannt, und Termin -> bitte Roboter Folgen
+
+
+            // bei serverantwort: nicht erkannt -> neuen Patienten anlegen
             stopInactivityTimeout();
             Intent intent = new Intent(MainActivity.this, RecordActivity.class);
             startActivity(intent);

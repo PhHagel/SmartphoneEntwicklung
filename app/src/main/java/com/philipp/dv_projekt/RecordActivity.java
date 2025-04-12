@@ -4,11 +4,12 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-
+import com.airbnb.lottie.LottieAnimationView;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -31,6 +32,9 @@ public class RecordActivity extends AppCompatActivity {
 
         stopBtn.setEnabled(false);
 
+        LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
+
+
         startBtn.setOnClickListener(v -> {
             String audioFileName = "audio_" + System.currentTimeMillis();
             filePath = Objects.requireNonNull(getExternalFilesDir(null)).getAbsolutePath() + "/" + audioFileName + ".m4a";
@@ -46,6 +50,10 @@ public class RecordActivity extends AppCompatActivity {
                 recorder.start();
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(true);
+
+                aufnahmeAnimation.setVisibility(View.VISIBLE);
+                aufnahmeAnimation.playAnimation();
+                aufnahmeAnimation.setRepeatCount(3000);
             } catch (IOException e) {
                 Toast.makeText(this, "❌ Fehler beim Starten der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -54,6 +62,9 @@ public class RecordActivity extends AppCompatActivity {
         stopBtn.setOnClickListener(v -> {
             try {
                 recorder.stop();
+                aufnahmeAnimation.cancelAnimation();
+                aufnahmeAnimation.setProgress(0f);
+                aufnahmeAnimation.setVisibility(View.INVISIBLE);
             } catch (RuntimeException e) {
                 Toast.makeText(this, "❌ Fehler beim Stoppen der Aufnahme", Toast.LENGTH_SHORT).show();
             }
