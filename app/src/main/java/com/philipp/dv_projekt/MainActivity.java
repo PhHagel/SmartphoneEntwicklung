@@ -32,6 +32,8 @@ import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
+import okhttp3.OkHttpClient;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final long TIMEOUT_IN_MILLIS = 10_000;  // Muss noch auf 30_000 gesetzt werden (am ende)
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PreviewView previewView;
     private ImageCapture imageCapture;
     private MediaPlayer player;
+    private final OkHttpClient client = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Button bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
+
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
@@ -173,10 +177,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             dialog.dismiss();
 
             // Hier muss das Bild zum Server gesendet werden
+            WebSocketClient test = new WebSocketClient();
+            test.connect(client);
 
 
-
-
+            // Bild hoch
+            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:5000/upload", client);
             // bei serverantwort: erkannt, aber kein Termin -> Termin vereinbaren
             // audioausgabe
 

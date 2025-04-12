@@ -43,6 +43,8 @@ public class RecordActivity extends AppCompatActivity {
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            recorder.setAudioEncodingBitRate(128000);
+            recorder.setAudioSamplingRate(44100);
             recorder.setOutputFile(filePath);
 
             try {
@@ -75,7 +77,7 @@ public class RecordActivity extends AppCompatActivity {
             Toast.makeText(this, "✅ Aufnahme gespeichert unter: " + filePath, Toast.LENGTH_SHORT).show(); // nur zum Testen
 
             // Hier soll die Audio zum Server gesendet werden
-
+            // Jackson für json mapper
             // Hier soll die Serverantwort verarbeitet werden
 
             String name = "Thomas";
