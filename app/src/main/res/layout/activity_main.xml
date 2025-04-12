@@ -65,6 +65,7 @@
             android:backgroundTint="@color/primaryBlue"
             android:text="@string/bild_aufnehmen"
             android:textColor="@color/lightBlue" />
+
     </LinearLayout>
 
     <TextView

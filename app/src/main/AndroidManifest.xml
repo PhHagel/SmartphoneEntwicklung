@@ -8,9 +8,9 @@
 
     <!-- Berechtigung für die Kamera -->
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -23,6 +23,7 @@
         android:theme="@style/Theme.DVProjekt">
 
         <activity android:name=".SplashActivity" />
+        <activity android:name=".RecordActivity" />
 
         <activity
             android:name=".MainActivity"

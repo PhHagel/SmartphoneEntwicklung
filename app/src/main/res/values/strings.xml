@@ -14,4 +14,12 @@
     <string name="patienten_terminal_v1_0">Patienten-Terminal v1.0</string>
     <string name="dr_cken_sie_bitte_auf_den_knopf_um_sich_zu_identifizieren">Drücken Sie bitte auf den Knopf \"Bild aufnehmen\" um sich zu identifizieren</string>
     <string name="bitte_heben_sie_das_ger_t_vorsichtig_vom_roboter_hoch">Bitte heben Sie das Gerät vorsichtig vom Roboter hoch</string>
+    <string name="neu">Neu</string>
+    <string name="neuer_patient">Neuer Patient</string>
+    <string name="neuer_termin">Neuer Termin</string>
+    <string name="aufnahme_starten">Aufnahme Starten</string>
+    <string name="aufnahme_stoppen">Aufnahme Stoppen</string>
+    <string name="nachname_n_vorname_n_geschlecht_n_geburtsdatum_n_telefonnummer_n_email">Nachname \n Vorname \n Geschlecht \n Geburtsdatum \n Telefonnummer \n Email</string>
+    <string name="seite_schlie_en">Seite Schließen</string>
+    <string name="klicken_sie_bitte_auf_aufnahme_starten_und_sagen_die_folgenden_daten">Klicken Sie bitte auf Aufnahme starten und sagen die folgenden Daten:</string>
 </resources>
