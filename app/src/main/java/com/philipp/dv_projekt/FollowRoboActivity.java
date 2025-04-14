@@ -15,7 +15,7 @@ public class FollowRoboActivity extends AppCompatActivity {
         setContentView(R.layout.activity_follow_robo);
 
         if (player == null) {
-            player = MediaPlayer.create(FollowRoboActivity.this, R.raw.bildaufnehmen);
+            player = MediaPlayer.create(FollowRoboActivity.this, R.raw.roboterfolgen);
 
             // hier muss noch abgehandelt werden, dass der Roboter am Ziel ist
 

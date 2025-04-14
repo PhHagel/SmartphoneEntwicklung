@@ -20,7 +20,7 @@ public class SmartphoneBackActivity extends AppCompatActivity {
 
         // Audio abspielen
         if (player == null) {
-            player = MediaPlayer.create(SmartphoneBackActivity.this, R.raw.bildaufnehmen);
+            player = MediaPlayer.create(SmartphoneBackActivity.this, R.raw.smartphonezurueklegen);
 
             // Setze OnCompletionListener, um auf das Ende des Audios zu warten
             player.setOnCompletionListener(mediaPlayer -> {

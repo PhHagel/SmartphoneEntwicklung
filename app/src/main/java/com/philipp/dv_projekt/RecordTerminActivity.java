@@ -2,15 +2,14 @@ package com.philipp.dv_projekt;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.airbnb.lottie.LottieAnimationView;
 
 import java.io.File;
@@ -21,6 +20,7 @@ import okhttp3.OkHttpClient;
 
 public class RecordTerminActivity extends AppCompatActivity {
     private MediaRecorder recorder;
+    private MediaPlayer player;
     private String filePath;
     private Button startBtn;
     private Button stopBtn;
@@ -39,6 +39,9 @@ public class RecordTerminActivity extends AppCompatActivity {
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
+        if (player == null) {
+            player = MediaPlayer.create(RecordTerminActivity.this, R.raw.terminannehmen);
+        }
 
         startBtn.setOnClickListener(v -> {
             String audioFileName = "audio_" + System.currentTimeMillis();
