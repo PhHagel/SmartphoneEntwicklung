@@ -27,6 +27,7 @@
 
         <activity android:name=".SplashActivity" />
         <activity android:name=".RecordActivity" />
+        <activity android:name=".RecordTerminActivity" />
 
         <activity
             android:name=".MainActivity"

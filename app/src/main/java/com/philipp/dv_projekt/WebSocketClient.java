@@ -19,7 +19,7 @@ public class WebSocketClient {
             @Override
             public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
                 System.out.println("✅ WebSocket geöffnet!");
-                webSocket.send("sm");
+                sendMessage("sm");
             }
 
             @Override
@@ -33,7 +33,6 @@ public class WebSocketClient {
             }
         });
 
-        client.dispatcher().executorService().shutdown();
     }
 
     public void sendMessage(String message) {

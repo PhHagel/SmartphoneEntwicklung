@@ -8,16 +8,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.airbnb.lottie.LottieAnimationView;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
 import okhttp3.OkHttpClient;
 
-public class RecordActivity extends AppCompatActivity {
-
+public class RecordTerminActivity extends AppCompatActivity {
     private MediaRecorder recorder;
     private String filePath;
     private Button startBtn;
@@ -27,7 +29,7 @@ public class RecordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_record);
+        setContentView(R.layout.activity_record_termin);
 
         startBtn = findViewById(R.id.btn_start_recording);
         stopBtn = findViewById(R.id.btn_stop_recording);
@@ -79,22 +81,20 @@ public class RecordActivity extends AppCompatActivity {
             startBtn.setEnabled(false);
             Toast.makeText(this, "✅ Aufnahme gespeichert unter: " + filePath, Toast.LENGTH_SHORT).show(); // nur zum Testen
 
-            // Hier wird die Audio zum Server gesendet
+            // Hier soll die Audio zum Server gesendet werden
             File audioFile = new File(filePath);
             UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:5000/upload", client);
 
             // Jackson für json mapper
             // Hier soll die Serverantwort verarbeitet werden
 
-            String name = "Thomas";
-            String vorname = "Müller";
-            String geschlecht = "männlich";
-            String geburtsdatum = "01.01.2000";
-            String telNr = "0123456789";
-            String email = "asdf@asdf.de";
+            String datum = "15.07.2025";
+            String tag = "Dienstag";
+            String von = "15:00 Uhr";
+            String bis = "15:30 Uhr";
 
-            showNewUserData("Name: " + name + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
-                    "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telNr + "\nE-Mail: " + email);
+            showNewUserData("Datum: " + datum + "\nTag: " + tag + "\nVon: " + von +
+                    "\nBis: " + bis);
         });
 
         closeBtn.setOnClickListener(v -> {
@@ -109,7 +109,7 @@ public class RecordActivity extends AppCompatActivity {
                 }
             }
 
-            Intent intent = new Intent(RecordActivity.this, MainActivity.class);
+            Intent intent = new Intent(RecordTerminActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         });

@@ -31,7 +31,6 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-
 import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -176,24 +175,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
-            // Hier muss das Bild zum Server gesendet werden
+            // Verbindung mit WebSocket
             WebSocketClient test = new WebSocketClient();
             test.connect(client);
 
-
-            // Bild hoch
+            // Bild hochladen
             UploadHelper.uploadImage(photoFile, "http://192.168.10.128:5000/upload", client);
+
+
+            // Hier muss noch die Serverantwort bearbeitet werden
+
             // bei serverantwort: erkannt, aber kein Termin -> Termin vereinbaren
-            // audioausgabe
+            stopInactivityTimeout();
+            Intent intentRecordTerminActivity = new Intent(MainActivity.this, RecordTerminActivity.class);
+            startActivity(intentRecordTerminActivity);
+            finish();
 
             // bei serverantwort: erkannt, und Termin -> bitte Roboter Folgen
 
 
             // bei serverantwort: nicht erkannt -> neuen Patienten anlegen
-            stopInactivityTimeout();
-            Intent intent = new Intent(MainActivity.this, RecordActivity.class);
-            startActivity(intent);
-            finish();
+            /*stopInactivityTimeout();
+            Intent intentRecordActivity = new Intent(MainActivity.this, RecordActivity.class);
+            startActivity(intentRecordActivity);
+            finish();*/
 
         });
 
