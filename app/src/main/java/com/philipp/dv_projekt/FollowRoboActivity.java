@@ -14,19 +14,18 @@ public class FollowRoboActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_follow_robo);
 
-        // Audio abspielen
         if (player == null) {
             player = MediaPlayer.create(FollowRoboActivity.this, R.raw.bildaufnehmen);
 
-            // Setze OnCompletionListener, um auf das Ende des Audios zu warten
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    // Wenn das Audio zu Ende ist, starte die nächste Aktivität
-                    Intent intentSmartphoneBackActivity = new Intent(FollowRoboActivity.this, SmartphoneBackActivity.class);
-                    startActivity(intentSmartphoneBackActivity);
-                    finish();
-                }
+            // hier muss noch abgehandelt werden, dass der Roboter am Ziel ist
+
+
+
+
+            player.setOnCompletionListener(mediaPlayer -> {
+                Intent intentSmartphoneBackActivity = new Intent(FollowRoboActivity.this, SmartphoneBackActivity.class);
+                startActivity(intentSmartphoneBackActivity);
+                finish();
             });
 
             player.start();
