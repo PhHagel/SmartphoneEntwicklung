@@ -28,6 +28,8 @@
         <activity android:name=".SplashActivity" />
         <activity android:name=".RecordActivity" />
         <activity android:name=".RecordTerminActivity" />
+        <activity android:name=".FollowRoboActivity" />
+        <activity android:name=".SmartphoneBackActivity" />
 
         <activity
             android:name=".MainActivity"

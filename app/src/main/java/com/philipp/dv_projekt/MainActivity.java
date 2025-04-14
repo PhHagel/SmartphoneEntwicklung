@@ -53,10 +53,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
-        // Verbindung mit WebSocket
-        WebSocketClient test = new WebSocketClient();
-        test.connect(client);
-
         bBildAufnehmen.setOnClickListener(this);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -82,6 +78,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         startInactivityTimeout();
 
+        // Verbindung mit WebSocket
+        WebSocketClient test = new WebSocketClient();
+        test.connect(client);
+
+        // Audio abspielen
         if (player == null) {
             player = MediaPlayer.create(MainActivity.this, R.raw.bildaufnehmen);
             player.start();
@@ -191,13 +192,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             finish();*/
 
             // bei serverantwort: erkannt, und Termin -> bitte Roboter Folgen
-            // Seite erstellen mit Roboter folgen
+            stopInactivityTimeout();
+            Intent intentFollowRoboActivity = new Intent(MainActivity.this, FollowRoboActivity.class);
+            startActivity(intentFollowRoboActivity);
+            finish();
+
 
             // bei serverantwort: nicht erkannt -> neuen Patienten anlegen
-            stopInactivityTimeout();
+            /*stopInactivityTimeout();
             Intent intentRecordActivity = new Intent(MainActivity.this, RecordActivity.class);
             startActivity(intentRecordActivity);
-            finish();
+            finish();*/
 
         });
 

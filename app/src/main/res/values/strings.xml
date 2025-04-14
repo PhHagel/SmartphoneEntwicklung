@@ -24,4 +24,6 @@
     <string name="klicken_sie_bitte_auf_aufnahme_starten_und_sagen_die_folgenden_daten">Klicken Sie bitte auf Aufnahme starten und sagen die folgenden Daten:</string>
     <string name="neuer_versuch">Neuer Versuch</string>
     <string name="tippen_sie_bitte_auf_aufnahme_starten_und_sagen_sie_ja_wenn_sie_den_termin_annehmen_wollen_und_nein_falls_sie_den_termin_nicht_annehmen_wollen">Tippen Sie bitte auf Aufnahme starten und sagen Sie Ja wenn Sie den Termin annehmen wollen, und Nein falls Sie den Termin nicht annehmen wollen und einen anderen Termin bekommen möchten.</string>
+    <string name="bitte_folgen_sie_dem_roboter_und_behalten_sie_das_smartphone_in_der_hand">Bitte folgen Sie dem Roboter und behalten Sie das Smartphone in der Hand.</string>
+    <string name="bitte_legen_sie_das_smartphone_vorsichtig_auf_den_roboter_zur_ck">Bitte legen Sie das Smartphone vorsichtig auf den Roboter zurück</string>
 </resources>
