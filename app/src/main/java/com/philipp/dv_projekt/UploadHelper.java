@@ -34,7 +34,7 @@ public class UploadHelper {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                System.out.println("❌ Fehler :" + e.getMessage());
+                System.out.println("❌ onFailure Fehler :" + e.getMessage());
             }
 
             @Override
@@ -43,7 +43,7 @@ public class UploadHelper {
                     assert response.body() != null;
                     System.out.println("✅ Upload erfolgreich: " + response.body().string());
                 } else {
-                    System.out.println("❌ Fehler: " + response.code());
+                    System.out.println("❌ Response Fehler: " + response.code());
                 }
             }
         });

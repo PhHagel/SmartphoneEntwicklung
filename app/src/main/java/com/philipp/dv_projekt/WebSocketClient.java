@@ -1,7 +1,6 @@
 package com.philipp.dv_projekt;
 
 import androidx.annotation.NonNull;
-
 import okhttp3.*;
 
 public class WebSocketClient {
@@ -12,7 +11,7 @@ public class WebSocketClient {
 
 
         Request request = new Request.Builder()
-                .url("ws://192.168.10.128:8080") // ← 10.0.2.2 statt localhost im Emulator!
+                .url("ws://192.168.10.128:3001") // ← 10.0.2.2 statt localhost im Emulator!
                 .build();
 
         webSocket = client.newWebSocket(request, new WebSocketListener() {
@@ -24,6 +23,7 @@ public class WebSocketClient {
 
             @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
+
                 System.out.println("📨 Nachricht empfangen: " + text);
             }
 
@@ -47,4 +47,3 @@ public class WebSocketClient {
         }
     }
 }
-

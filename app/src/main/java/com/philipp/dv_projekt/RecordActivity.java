@@ -2,6 +2,7 @@ package com.philipp.dv_projekt;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +23,7 @@ public class RecordActivity extends AppCompatActivity {
     private String filePath;
     private Button startBtn;
     private Button stopBtn;
+    private MediaPlayer player;
     private final OkHttpClient client = new OkHttpClient();
 
     @Override
@@ -36,6 +38,11 @@ public class RecordActivity extends AppCompatActivity {
         stopBtn.setEnabled(false);
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
+
+        if (player == null) {
+            player = MediaPlayer.create(RecordActivity.this, R.raw.tonaufnehmen);
+            player.start();
+        }
 
 
         startBtn.setOnClickListener(v -> {
@@ -81,7 +88,7 @@ public class RecordActivity extends AppCompatActivity {
 
             // Hier wird die Audio zum Server gesendet
             File audioFile = new File(filePath);
-            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:5000/upload", client);
+            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload", client);
 
             // Jackson für json mapper
             // Hier soll die Serverantwort verarbeitet werden

@@ -51,8 +51,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
 
-
         getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
+
+        // Verbindung mit WebSocket
+        WebSocketClient test = new WebSocketClient();
+        test.connect(client);
 
         bBildAufnehmen.setOnClickListener(this);
 
@@ -175,30 +178,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
-            // Verbindung mit WebSocket
-            WebSocketClient test = new WebSocketClient();
-            test.connect(client);
-
             // Bild hochladen
-            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:5000/upload", client);
+            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload", client);
 
 
             // Hier muss noch die Serverantwort bearbeitet werden
 
             // bei serverantwort: erkannt, aber kein Termin -> Termin vereinbaren
-            stopInactivityTimeout();
+            /*stopInactivityTimeout();
             Intent intentRecordTerminActivity = new Intent(MainActivity.this, RecordTerminActivity.class);
             startActivity(intentRecordTerminActivity);
-            finish();
+            finish();*/
 
             // bei serverantwort: erkannt, und Termin -> bitte Roboter Folgen
-
+            // Seite erstellen mit Roboter folgen
 
             // bei serverantwort: nicht erkannt -> neuen Patienten anlegen
-            /*stopInactivityTimeout();
+            stopInactivityTimeout();
             Intent intentRecordActivity = new Intent(MainActivity.this, RecordActivity.class);
             startActivity(intentRecordActivity);
-            finish();*/
+            finish();
 
         });
 
