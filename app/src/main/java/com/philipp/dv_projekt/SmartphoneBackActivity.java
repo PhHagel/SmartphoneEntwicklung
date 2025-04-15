@@ -5,7 +5,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SmartphoneBackActivity extends AppCompatActivity {
@@ -25,7 +24,6 @@ public class SmartphoneBackActivity extends AppCompatActivity {
             // Setze OnCompletionListener, um auf das Ende des Audios zu warten
             player.setOnCompletionListener(mediaPlayer -> {
 
-                // Handler mit MainLooper verwenden (nicht deprecated)
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     Intent intent = new Intent(SmartphoneBackActivity.this, SplashActivity.class);
                     startActivity(intent);

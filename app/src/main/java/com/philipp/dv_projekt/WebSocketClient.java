@@ -1,17 +1,23 @@
 package com.philipp.dv_projekt;
 
 import androidx.annotation.NonNull;
+import com.google.gson.JsonSyntaxException;
 import okhttp3.*;
 
 public class WebSocketClient {
 
     private WebSocket webSocket;
+    private WebSocketCallback callback;
+
+    public void setCallback(WebSocketCallback callback) {
+        this.callback = callback;
+    }
 
     public void connect(OkHttpClient client) {
 
 
         Request request = new Request.Builder()
-                .url("ws://192.168.10.128:3001") // ← 10.0.2.2 statt localhost im Emulator!
+                .url("ws://192.168.10.128:3001") // ← IP des Servers samt port
                 .build();
 
         webSocket = client.newWebSocket(request, new WebSocketListener() {
@@ -23,8 +29,22 @@ public class WebSocketClient {
 
             @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
-
                 System.out.println("📨 Nachricht empfangen: " + text);
+
+                if (callback != null) {
+                    callback.onMessageReceived(text);
+                }
+
+                try {
+                    ServerResponseHandler handler = new ServerResponseHandler();
+                    handler.getResponseType(text);
+
+                } catch (JsonSyntaxException e) {
+                    System.out.println("⚠️ Ungültiges JSON: " + text);
+
+                } catch (IllegalStateException e) {
+                    System.out.println("⚠️ JSON ist kein Objekt: " + text);
+                }
             }
 
             @Override

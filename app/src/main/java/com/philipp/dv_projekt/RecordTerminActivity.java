@@ -11,20 +11,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.airbnb.lottie.LottieAnimationView;
-
+import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-
 import okhttp3.OkHttpClient;
 
-public class RecordTerminActivity extends AppCompatActivity {
+public class RecordTerminActivity extends AppCompatActivity implements WebSocketCallback {
     private MediaRecorder recorder;
     private MediaPlayer player;
     private String filePath;
     private Button startBtn;
     private Button stopBtn;
     private final OkHttpClient client = new OkHttpClient();
+    private final WebSocketClient webSocketClient = new WebSocketClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +37,14 @@ public class RecordTerminActivity extends AppCompatActivity {
 
         stopBtn.setEnabled(false);
 
+        webSocketClient.setCallback(this);
+        webSocketClient.connect(client);
+
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
         if (player == null) {
             player = MediaPlayer.create(RecordTerminActivity.this, R.raw.terminannehmen);
+            player.start();
         }
 
         startBtn.setOnClickListener(v -> {
@@ -88,16 +92,6 @@ public class RecordTerminActivity extends AppCompatActivity {
             File audioFile = new File(filePath);
             UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:5000/upload", client);
 
-            // Jackson für json mapper
-            // Hier soll die Serverantwort verarbeitet werden
-
-            String datum = "15.07.2025";
-            String tag = "Dienstag";
-            String von = "15:00 Uhr";
-            String bis = "15:30 Uhr";
-
-            showNewUserData("Datum: " + datum + "\nTag: " + tag + "\nVon: " + von +
-                    "\nBis: " + bis);
         });
 
         closeBtn.setOnClickListener(v -> {
@@ -118,6 +112,42 @@ public class RecordTerminActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onMessageReceived(String jsonText) {
+        runOnUiThread(() -> {
+            ServerResponseHandler handler = new ServerResponseHandler();
+            ResponseType type = handler.getResponseType(jsonText);
+
+            switch (type) {
+                case DATE_TIME:
+                    DateTimeResponse dateTimeResponse = new Gson().fromJson(jsonText, DateTimeResponse.class);
+
+                    String datum = dateTimeResponse.Date;
+                    String tag = dateTimeResponse.Weekday;
+                    String zeit = dateTimeResponse.Time;
+
+                    showNewUserData("Datum: " + datum + "\nTag: " + tag + "\nZeit: " + zeit);
+                    break;
+
+                case TERMIN_INFO:
+                    TerminResponse terminResponse = new Gson().fromJson(jsonText, TerminResponse.class);
+                    String antwort = terminResponse.message;
+                    if (antwort.equals("Nein")) {
+                        Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
+                    } else if (antwort.equals("Ja")) {
+                        Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+
+                default:
+                    Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
+    }
+
     private void showNewUserData(String userDataFromServer) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_new_user);
@@ -127,6 +157,14 @@ public class RecordTerminActivity extends AppCompatActivity {
         Button userAcceptBtn = dialog.findViewById(R.id.userAcceptBtn);
 
         userDeleteBtn.setOnClickListener(v -> {
+            webSocketClient.sendMessage("termin_declined");
+            // #################################################
+            // #################################################
+            // #################################################
+            // hier muss noch mit Hendrik gesprochen werden wegen message
+            // #################################################
+            // #################################################
+            // #################################################
             File audioFile = new File(filePath);
             if (audioFile.delete()) {
                 Toast.makeText(this, "✅ Audio gelöscht!", Toast.LENGTH_SHORT).show();
@@ -137,12 +175,9 @@ public class RecordTerminActivity extends AppCompatActivity {
         });
 
         userAcceptBtn.setOnClickListener(v -> {
+            webSocketClient.sendMessage("termin_accepted");
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
-
-            // Hier muss das OK an den Server gesendet werden
-
-
         });
 
         textCheckView.setText(userDataFromServer);

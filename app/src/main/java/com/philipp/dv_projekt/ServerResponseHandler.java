@@ -1,54 +1,49 @@
 package com.philipp.dv_projekt;
 
-
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class ServerResponseHandler {
 
-    private final Gson gson = new Gson();
+    public ResponseType getResponseType(String jsonString) {
+        try {
+            JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
 
-    public void handleResponse(String jsonString) {
-        JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
+            if (json.has("type")) {
+                String type = json.get("type").getAsString();
 
-        if (json.has("type")) {
-            String type = json.get("type").getAsString();
+                switch (type) {
+                    case "Robot_reached_Goal":
+                        return ResponseType.ROBOT_REACHED_GOAL;
 
-            switch (type) {
-                case "Robot_reached_Goal":
-                    RobotReachedGoalResponse robot = gson.fromJson(json, RobotReachedGoalResponse.class);
-                    System.out.println("➡️ Roboter hat Ziel erreicht");
-                    break;
+                    case "Known_Customer":
+                        return ResponseType.KNOWN_CUSTOMER;
 
-                case "Known_Customer":
-                    KnownCustomerResponse known = gson.fromJson(json, KnownCustomerResponse.class);
-                    System.out.println("✅ Bekannter Patient, Termin: " + known.Appointment);
-                    break;
+                    case "Unknown_Customer":
+                        return ResponseType.UNKNOWN_CUSTOMER;
 
-                case "Unknown_Customer":
-                    UnknownCustomerResponse unknown = gson.fromJson(json, UnknownCustomerResponse.class);
-                    System.out.println("❌ Unbekannter Patient");
-                    break;
+                    default:
+                        return ResponseType.UNKNOWN;
+                }
 
-                default:
-                    System.out.println("❓ Unbekannter Typ: " + type);
+            } else if (json.has("Success") && json.get("message").isJsonObject()) {
+                return ResponseType.PERSON_DATA;
+
+            } else if (json.has("Success") && json.get("Success").getAsString().equals("FALSE")) {
+                return ResponseType.PERSON_DATA_SUCCESS_FALSE;
+
+            } else if (json.has("Success") && json.get("message").isJsonPrimitive()) {
+                return ResponseType.TERMIN_INFO;
+
+            } else if (json.has("Date") && json.has("Time") && json.has("Weekday")) {
+                return ResponseType.DATE_TIME;
+
+            } else {
+                return ResponseType.UNKNOWN;
             }
 
-        } else if (json.has("Success") && json.get("message").isJsonObject()) {
-            PersonResponse person = gson.fromJson(json, PersonResponse.class);
-            System.out.println("👤 Person erkannt: " + person.message.firstname + " " + person.message.lastname);
-
-        } else if (json.has("Success") && json.get("message").isJsonPrimitive()) {
-            TerminResponse termin = gson.fromJson(json, TerminResponse.class);
-            System.out.println("📅 Terminantwort: " + termin.message);
-
-        } else if (json.has("Date") && json.has("Time") && json.has("Weekday")) {
-            DateTimeResponse datetime = gson.fromJson(json, DateTimeResponse.class);
-            System.out.println("🗓️ Datum: " + datetime.Date + ", Uhrzeit: " + datetime.Time + ", Tag: " + datetime.Weekday);
-
-        } else {
-            System.out.println("❗ Nicht erkannte Struktur: " + jsonString);
+        } catch (Exception e) {
+            return ResponseType.UNKNOWN;
         }
     }
 }

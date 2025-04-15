@@ -11,13 +11,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.gson.Gson;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
 import okhttp3.OkHttpClient;
 
-public class RecordActivity extends AppCompatActivity {
+public class RecordActivity extends AppCompatActivity implements WebSocketCallback {
 
     private MediaRecorder recorder;
     private String filePath;
@@ -25,6 +27,7 @@ public class RecordActivity extends AppCompatActivity {
     private Button stopBtn;
     private MediaPlayer player;
     private final OkHttpClient client = new OkHttpClient();
+    private final WebSocketClient webSocketClient = new WebSocketClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,9 @@ public class RecordActivity extends AppCompatActivity {
         Button closeBtn = findViewById(R.id.btn_closePage);
 
         stopBtn.setEnabled(false);
+
+        webSocketClient.setCallback(this);
+        webSocketClient.connect(client);
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
@@ -90,18 +96,17 @@ public class RecordActivity extends AppCompatActivity {
             File audioFile = new File(filePath);
             UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload", client);
 
-            // Jackson für json mapper
-            // Hier soll die Serverantwort verarbeitet werden
+            // Audio abspielen (noch nicht da)
+            // Hier wird Audio abgespielt (noch nicht da)
+            if (player == null) {
+                player = MediaPlayer.create(RecordActivity.this, R.raw.bildaufnehmen);
+                player.start();
+            }
+            // ##############################################
+            // ##############################################
+            // ##############################################
+            // ##############################################
 
-            String name = "Thomas";
-            String vorname = "Müller";
-            String geschlecht = "männlich";
-            String geburtsdatum = "01.01.2000";
-            String telNr = "0123456789";
-            String email = "asdf@asdf.de";
-
-            showNewUserData("Name: " + name + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
-                    "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telNr + "\nE-Mail: " + email);
         });
 
         closeBtn.setOnClickListener(v -> {
@@ -122,6 +127,35 @@ public class RecordActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onMessageReceived(String jsonText) {
+        runOnUiThread(() -> {
+            ServerResponseHandler handler = new ServerResponseHandler();
+            ResponseType type = handler.getResponseType(jsonText);
+
+            switch (type) {
+                case PERSON_DATA:
+                    PersonResponse person = new Gson().fromJson(jsonText, PersonResponse.class);
+                    String nachname = person.message.lastname;
+                    String vorname = person.message.firstname;
+                    String geschlecht = person.message.sex;
+                    String geburtsdatum = person.message.dateOfBirth;
+                    String telefon = person.message.phoneNumber;
+                    String email = person.message.emailAddress;
+                    showNewUserData("Nachname: " + nachname + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
+                            "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telefon + "\nE-Mail: " + email);
+                    break;
+
+                case PERSON_DATA_SUCCESS_FALSE:
+                    Toast .makeText(this, "❌ Personendaten nicht erfolgreich neu versuchen", Toast.LENGTH_SHORT).show();
+                    break;
+
+                default:
+                    Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void showNewUserData(String userDataFromServer) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_new_user);
@@ -133,15 +167,17 @@ public class RecordActivity extends AppCompatActivity {
         userDeleteBtn.setOnClickListener(v -> {
             File audioFile = new File(filePath);
             if (audioFile.delete()) {
-                Toast.makeText(this, "✅ Audio gelöscht!", Toast.LENGTH_SHORT).show();
+                webSocketClient.sendMessage("user_declined");
+                Toast.makeText(this, "✅ Person gelöscht. Bitte neu versuchen", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             } else {
-                Toast.makeText(this, "❌ Fehler beim Löschen der Audio!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "❌ Fehler beim Löschen der Person!", Toast.LENGTH_SHORT).show();
             }
         });
 
         userAcceptBtn.setOnClickListener(v -> {
-            Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
+            webSocketClient.sendMessage("user_accepted");
+            Toast.makeText(this, "✅ Person akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
             // Hier muss das OK an den Server gesendet werden

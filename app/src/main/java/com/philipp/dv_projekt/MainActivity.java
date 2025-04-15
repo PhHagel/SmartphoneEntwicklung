@@ -25,6 +25,9 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -33,7 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import okhttp3.OkHttpClient;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, WebSocketCallback {
 
     private static final long TIMEOUT_IN_MILLIS = 10_000;  // Muss noch auf 30_000 gesetzt werden (am ende)
     private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
@@ -50,6 +53,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Button bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
+
+        WebSocketClient webSocketClient = new WebSocketClient();
+        webSocketClient.setCallback(this);
+        webSocketClient.connect(client);
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
@@ -77,10 +84,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }, getExecutor());
 
         startInactivityTimeout();
-
-        // Verbindung mit WebSocket
-        WebSocketClient test = new WebSocketClient();
-        test.connect(client);
 
         // Audio abspielen
         if (player == null) {
@@ -179,36 +182,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
+            stopInactivityTimeout();
+
             // Bild hochladen
             UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload", client);
 
-
-            // Hier muss noch die Serverantwort bearbeitet werden
-
-            // bei serverantwort: erkannt, aber kein Termin -> Termin vereinbaren
-            /*stopInactivityTimeout();
-            Intent intentRecordTerminActivity = new Intent(MainActivity.this, RecordTerminActivity.class);
-            startActivity(intentRecordTerminActivity);
-            finish();*/
-
-            // bei serverantwort: erkannt, und Termin -> bitte Roboter Folgen
-            stopInactivityTimeout();
-            Intent intentFollowRoboActivity = new Intent(MainActivity.this, FollowRoboActivity.class);
-            startActivity(intentFollowRoboActivity);
-            finish();
-
-
-            // bei serverantwort: nicht erkannt -> neuen Patienten anlegen
-            /*stopInactivityTimeout();
-            Intent intentRecordActivity = new Intent(MainActivity.this, RecordActivity.class);
-            startActivity(intentRecordActivity);
-            finish();*/
-
+            // Hier wird Audio abgespielt (noch nicht da)
+            if (player == null) {
+                player = MediaPlayer.create(MainActivity.this, R.raw.bildaufnehmen);
+                player.start();
+            }
+            // ##############################################
+            // ##############################################
+            // ##############################################
+            // ##############################################
         });
 
         imageCheckView.setImageURI(Uri.fromFile(photoFile));
 
         dialog.show();
+    }
+
+    @Override
+    public void onMessageReceived(String jsonText) {
+        runOnUiThread(() -> {
+            ServerResponseHandler handler = new ServerResponseHandler();
+            ResponseType type = handler.getResponseType(jsonText);
+
+            switch (type) {
+                case KNOWN_CUSTOMER:
+                    JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
+                    String appointment = json.has("Appointment") ? json.get("Appointment").getAsString() : "FALSE";
+                    if (appointment.equalsIgnoreCase("TRUE")) {
+                        startActivity(new Intent(this, FollowRoboActivity.class));
+                    } else {
+                        startActivity(new Intent(this, RecordTerminActivity.class));
+                    }
+                    break;
+
+                case UNKNOWN_CUSTOMER:
+                    startActivity(new Intent(this, RecordActivity.class));
+                    break;
+
+                default:
+                    Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+            }
+
+            finish();
+        });
     }
 
     private void startInactivityTimeout() {
