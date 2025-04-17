@@ -90,7 +90,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
             // Hier soll die Audio zum Server gesendet werden
             File audioFile = new File(filePath);
-            UploadHelper.uploadAudio(audioFile, "http://192.168.191.95:3000/upload/sprache", client);
+            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", client);
 
             if (player == null) {
                 player = MediaPlayer.create(RecordTerminActivity.this, R.raw.audiotoserver);

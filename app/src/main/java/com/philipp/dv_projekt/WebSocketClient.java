@@ -16,7 +16,7 @@ public class WebSocketClient {
 
 
         Request request = new Request.Builder()
-                .url("ws://192.168.191.95:3001") // ← IP des Servers samt port
+                .url("ws://192.168.10.128:3001") // ← IP des Servers samt port
                 .build();
 
         webSocket = client.newWebSocket(request, new WebSocketListener() {

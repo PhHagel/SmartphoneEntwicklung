@@ -94,7 +94,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
 
             // Hier wird die Audio zum Server gesendet
             File audioFile = new File(filePath);
-            UploadHelper.uploadAudio(audioFile, "http://192.168.191.95:3000/upload/sprache", client);
+            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", client);
 
             // Audio abspielen (noch nicht da)
             // Hier wird Audio abgespielt (noch nicht da)

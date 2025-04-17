@@ -26,7 +26,7 @@ public class ServerResponseHandler {
                         return ResponseType.UNKNOWN;
                 }
 
-            } else if (json.has("Success") && json.get("message").isJsonObject()) {
+            } else if (json.has("Success") && json.get("Success").getAsString().equals("TRUE") && json.get("message").isJsonObject()) {
                 return ResponseType.PERSON_DATA;
 
             } else if (json.has("Success") && json.get("Success").getAsString().equals("FALSE")) {

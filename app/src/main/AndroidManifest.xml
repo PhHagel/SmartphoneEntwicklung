@@ -30,6 +30,7 @@
         <activity android:name=".RecordTerminActivity" />
         <activity android:name=".FollowRoboActivity" />
         <activity android:name=".SmartphoneBackActivity" />
+        <activity android:name=".AudioPlayActivity" />
 
         <activity
             android:name=".MainActivity"
