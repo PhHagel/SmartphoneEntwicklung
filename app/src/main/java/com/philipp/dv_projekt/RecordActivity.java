@@ -94,18 +94,27 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
 
             // Hier wird die Audio zum Server gesendet
             File audioFile = new File(filePath);
-            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload", client);
+            UploadHelper.uploadAudio(audioFile, "http://192.168.191.95:3000/upload/sprache", client);
 
             // Audio abspielen (noch nicht da)
             // Hier wird Audio abgespielt (noch nicht da)
             if (player == null) {
-                player = MediaPlayer.create(RecordActivity.this, R.raw.bildaufnehmen);
+                player = MediaPlayer.create(RecordActivity.this, R.raw.audiotoserver);
                 player.start();
             }
             // ##############################################
             // ##############################################
             // ##############################################
             // ##############################################
+
+            String nachname = "Hagel";
+            String vorname = "Philipp";
+            String geschlecht = "M";
+            String geburtsdatum = "15.01.2000";
+            String telefon = "123";
+            String email = "test@thomas.de";
+            showNewUserData("Nachname: " + nachname + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
+                    "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telefon + "\nE-Mail: " + email);
 
         });
 
@@ -141,7 +150,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
                     String geschlecht = person.message.sex;
                     String geburtsdatum = person.message.dateOfBirth;
                     String telefon = person.message.phoneNumber;
-                    String email = person.message.emailAddress;
+                    String email = person.message.emailAddress; //schauen wegen @
                     showNewUserData("Nachname: " + nachname + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
                             "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telefon + "\nE-Mail: " + email);
                     break;
@@ -179,10 +188,6 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
             webSocketClient.sendMessage("user_accepted");
             Toast.makeText(this, "✅ Person akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
-
-            // Hier muss das OK an den Server gesendet werden
-
-
         });
 
         textCheckView.setText(userDataFromServer);

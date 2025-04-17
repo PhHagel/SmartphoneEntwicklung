@@ -1,7 +1,6 @@
 package com.philipp.dv_projekt;
 
 import androidx.annotation.NonNull;
-import com.google.gson.JsonSyntaxException;
 import okhttp3.*;
 
 public class WebSocketClient {
@@ -17,7 +16,7 @@ public class WebSocketClient {
 
 
         Request request = new Request.Builder()
-                .url("ws://192.168.10.128:3001") // ← IP des Servers samt port
+                .url("ws://192.168.191.95:3001") // ← IP des Servers samt port
                 .build();
 
         webSocket = client.newWebSocket(request, new WebSocketListener() {
@@ -31,7 +30,7 @@ public class WebSocketClient {
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
                 System.out.println("📨 Nachricht empfangen: " + text);
 
-                if (callback != null) {
+                /*if (callback != null) {
                     callback.onMessageReceived(text);
                 }
 
@@ -44,7 +43,7 @@ public class WebSocketClient {
 
                 } catch (IllegalStateException e) {
                     System.out.println("⚠️ JSON ist kein Objekt: " + text);
-                }
+                }*/
             }
 
             @Override

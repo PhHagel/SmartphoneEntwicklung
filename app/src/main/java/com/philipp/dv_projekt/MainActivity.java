@@ -185,16 +185,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             stopInactivityTimeout();
 
             // Bild hochladen
-            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload", client);
+            UploadHelper.uploadImage(photoFile, "http://192.168.191.95:3000/upload/gesicht", client);
 
             // Hier wird Audio abgespielt (noch nicht da)
             if (player == null) {
-                player = MediaPlayer.create(MainActivity.this, R.raw.bildaufnehmen);
+                player = MediaPlayer.create(MainActivity.this, R.raw.phototoserver);
                 player.start();
             }
+
+            // Nicht erkannt
+            //startActivity(new Intent(this, RecordActivity.class));
             // ##############################################
+            // Erkannt
+            // startActivity(new Intent(this, FollowRoboActivity.class));
             // ##############################################
-            // ##############################################
+            // erkannt aber kein Termin
+            startActivity(new Intent(this, RecordTerminActivity.class));
             // ##############################################
         });
 

@@ -20,7 +20,7 @@ public class UploadHelper {
         // MultipartBody (Formulardaten mit Datei)
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("image", imageFile.getName(), fileBody)
+                .addFormDataPart("myfile", imageFile.getName(), fileBody)
                 // Optional: weitere Felder im Formular
                 .build();
 
@@ -60,7 +60,7 @@ public class UploadHelper {
         // MultipartBody (Formulardaten mit Datei)
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("audio", audioFile.getName(), fileBody) // "audio" statt "image"
+                .addFormDataPart("myfile", audioFile.getName(), fileBody) // "audio" statt "image"
                 .build();
 
         // URL deines Servers
