@@ -7,6 +7,19 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/infoText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/pr_fen_sie_bitte_die_angegebenen_daten"
+        android:textAlignment="center"
+        android:textColor="#333333"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
         android:id="@+id/textCheckView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
