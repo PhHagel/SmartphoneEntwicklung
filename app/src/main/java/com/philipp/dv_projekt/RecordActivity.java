@@ -13,14 +13,13 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.gson.Gson;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-
 import okhttp3.OkHttpClient;
 
 public class RecordActivity extends AppCompatActivity implements WebSocketCallback {
+
 
     private MediaRecorder recorder;
     private String filePath;
@@ -30,6 +29,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
     private File audioFile;
     private final OkHttpClient client = new OkHttpClient();
     private final WebSocketClient webSocketClient = new WebSocketClient();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +54,15 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         player = MediaPlayer.create(RecordActivity.this, R.raw.tonaufnehmen);
         player.start();
 
-
+        player.setOnCompletionListener(mp -> {
+            Intent timeoutIntent = new Intent(this, TimeoutService.class);
+            startService(timeoutIntent);
+        });
 
         startBtn.setOnClickListener(v -> {
+
+            stopService(new Intent(this, TimeoutService.class));
+
             String audioFileName = "person-" + System.currentTimeMillis();
             filePath = Objects.requireNonNull(getExternalFilesDir(null)).getAbsolutePath() + "/" + audioFileName + ".m4a";
 
@@ -130,8 +136,12 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         });
     }
 
+
     @Override
     public void onMessageReceived(String jsonText) {
+
+        stopService(new Intent(this, TimeoutService.class));
+
         runOnUiThread(() -> {
             ServerResponseHandler handler = new ServerResponseHandler();
             ResponseType type = handler.getResponseType(jsonText);
@@ -159,10 +169,12 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         });
     }
 
+
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("RecordActivity", "📨 Systemnachricht: " + systemText);
     }
+
 
     private void showNewUserData(String userDataFromServer) {
         Dialog dialog = new Dialog(this);

@@ -1,16 +1,17 @@
 package com.philipp.dv_projekt;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.gson.Gson;
 import java.io.File;
@@ -56,7 +57,15 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         player = MediaPlayer.create(RecordTerminActivity.this, R.raw.terminannehmen);
         player.start();
 
+        player.setOnCompletionListener(mp -> {
+            Intent timeoutIntent = new Intent(this, TimeoutService.class);
+            startService(timeoutIntent);
+        });
+
         startBtn.setOnClickListener(v -> {
+
+            stopService(new Intent(this, TimeoutService.class));
+
             String audioFileName = "command-" + System.currentTimeMillis();
             filePath = Objects.requireNonNull(getExternalFilesDir(null)).getAbsolutePath() + "/" + audioFileName + ".m4a";
 
@@ -122,6 +131,8 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 }
             }
 
+            stopService(new Intent(this, TimeoutService.class));
+
             Intent intent = new Intent(RecordTerminActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -160,6 +171,9 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                             }
                             player = MediaPlayer.create(RecordTerminActivity.this, R.raw.abgelehntertermin);
                             player.start();
+
+
+
                         } else if (antwort.equals("Ja")) {
                             Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
                             if (player != null) {
@@ -185,4 +199,16 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     public void onSystemMessageReceived(String systemText) {
         Log.d("RecordTerminActivity", "📨 Systemnachricht: " + systemText);
     }
+
+    // hier wird bei jedem Touch-Event der Timeout in TimeoutService.java zurückgesetzt
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Reset an den Service schicken
+        Intent reset = new Intent("com.philipp.ACTION_RESET_TIMEOUT");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(reset);
+
+        return super.dispatchTouchEvent(ev);
+    }
+
+
 }

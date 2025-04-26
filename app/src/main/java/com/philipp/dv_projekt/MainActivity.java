@@ -11,8 +11,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,35 +22,28 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, WebSocketCallback {
 
-    private static final long TIMEOUT_IN_MILLIS = 10_000;  // Muss noch auf 30_000 gesetzt werden (am ende)
-    private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
-    private Runnable timeoutRunnable;
+
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private PreviewView previewView;
     private ImageCapture imageCapture;
     private MediaPlayer player;
     private final OkHttpClient client = new OkHttpClient();
     private final WebSocketClient webSocketClient = new WebSocketClient();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE}, 100);
         }
 
-
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try {
@@ -89,9 +79,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }, getExecutor());
 
-        //startInactivityTimeout();
-
-        // Audio abspielen
         if (player != null) {
             player.release();
             player = null;
@@ -99,11 +86,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         player = MediaPlayer.create(MainActivity.this, R.raw.bildaufnehmen);
         player.start();
 
+        player.setOnCompletionListener(mp -> {
+            Intent timeoutIntent = new Intent(this, TimeoutService.class);
+            startService(timeoutIntent);
+        });
     }
+
 
     private Executor getExecutor() {
         return ContextCompat.getMainExecutor(this);
     }
+
 
     @SuppressLint("RestrictedApi")
     private void startCameraX(ProcessCameraProvider cameraProvider) {
@@ -132,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             capturePhoto();
         }
     }
+
 
     private void capturePhoto() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -170,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         );
     }
 
+
     private void showPhoto(File photoFile) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_photo_preview);
@@ -177,6 +172,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageView imageCheckView = dialog.findViewById(R.id.imageCheckView);
         Button imageDeleteBtn = dialog.findViewById(R.id.imageDeleteBtn);
         Button imageAcceptBtn = dialog.findViewById(R.id.imageAcceptBtn);
+
+        imageCheckView.setImageURI(Uri.fromFile(photoFile));
+        dialog.show();
 
         imageDeleteBtn.setOnClickListener(v -> {
             if (photoFile.delete()) {
@@ -191,12 +189,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
-            //stopInactivityTimeout();
+            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", client);
 
-            // Bild hochladen
-            // UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", client);
+            stopService(new Intent(this, TimeoutService.class));
 
-            // Hier wird Audio abgespielt (noch nicht da)
             if (player != null) {
                 player.release();
                 player = null;
@@ -205,30 +201,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             player.start();
 
             // Test Request (funktioniert):
-            webSocketClient.sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"1\"}");
+            webSocketClient.sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"3\"}");
             Log.d("ServerResponseHandler", "✅ #########################");
             Log.d("ServerResponseHandler", "✅ #########################");
             Log.d("ServerResponseHandler", "✅ #########################");
-
-            // Nicht erkannt
-            // startActivity(new Intent(this, RecordActivity.class));
-            // ##############################################
-            // Erkannt
-            // startActivity(new Intent(this, FollowRoboActivity.class));
-            // ##############################################
-            // erkannt aber kein Termin
-            // startActivity(new Intent(this, RecordTerminActivity.class));
-            // ##############################################
-            // startActivity(new Intent(this, AudioPlayActivity.class));
         });
-
-        imageCheckView.setImageURI(Uri.fromFile(photoFile));
-
-        dialog.show();
     }
 
+
+    // on Message Handler für Json-Nachrichten vom Server
     @Override
     public void onMessageReceived(String jsonText) {
+
+        stopService(new Intent(this, TimeoutService.class));
+
         player.setOnCompletionListener(mp -> {
             // Dieser Block wird aufgerufen, sobald die Audiodatei zu Ende gespielt ist:
             runOnUiThread(() -> {
@@ -259,40 +245,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+
+    // on Message Handler für System-Nachrichten vom Server
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("MainActivity", "📨 Systemnachricht: " + systemText);
     }
 
-    /*private void startInactivityTimeout() {
-        if (timeoutRunnable != null) {
-            timeoutHandler.removeCallbacks(timeoutRunnable);
-        }
 
-        timeoutRunnable = () -> {
-            Intent intent = new Intent(MainActivity.this, SplashActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-        };
-
-        timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_IN_MILLIS);
-    }
-
-    private void resetInactivityTimeout() {
-        startInactivityTimeout();
-    }*/
-
+    // hier wird bei jedem Touch-Event der Timeout in TimeoutService.java zurückgesetzt
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        //resetInactivityTimeout();
-        return super.dispatchTouchEvent(ev);
-    }
+        // Reset an den Service schicken
+        Intent reset = new Intent("com.philipp.ACTION_RESET_TIMEOUT");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(reset);
 
-    private void stopInactivityTimeout() {
-        if (timeoutRunnable != null) {
-            timeoutHandler.removeCallbacks(timeoutRunnable);
-        }
+        return super.dispatchTouchEvent(ev);
     }
 
 

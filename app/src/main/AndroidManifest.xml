@@ -31,16 +31,14 @@
         <activity android:name=".FollowRoboActivity" />
         <activity android:name=".SmartphoneBackActivity" />
         <activity android:name=".AudioPlayActivity" />
-
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:theme="@style/Theme.DVProjekt">
+        <activity android:name=".MainActivity" android:exported="true" android:theme="@style/Theme.DVProjekt">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".TimeoutService" android:exported="false" />
 
     </application>
 
