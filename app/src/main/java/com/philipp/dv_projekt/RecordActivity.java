@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -102,19 +103,6 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
                 player = MediaPlayer.create(RecordActivity.this, R.raw.audiotoserver);
                 player.start();
             }
-            // ##############################################
-            // ##############################################
-            // ##############################################
-            // ##############################################
-
-            String nachname = "Hagel";
-            String vorname = "Philipp";
-            String geschlecht = "M";
-            String geburtsdatum = "15.01.2000";
-            String telefon = "123";
-            String email = "test@thomas.de";
-            showNewUserData("Nachname: " + nachname + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
-                    "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telefon + "\nE-Mail: " + email);
 
         });
 
@@ -165,6 +153,11 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         });
     }
 
+    @Override
+    public void onSystemMessageReceived(String systemText) {
+        Log.d("RecordActivity", "📨 Systemnachricht: " + systemText);
+    }
+
     private void showNewUserData(String userDataFromServer) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_new_user);
@@ -187,6 +180,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         userAcceptBtn.setOnClickListener(v -> {
             webSocketClient.sendMessage("user_accepted");
             Toast.makeText(this, "✅ Person akzeptiert!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, RecordTerminActivity.class));
             dialog.dismiss();
         });
 

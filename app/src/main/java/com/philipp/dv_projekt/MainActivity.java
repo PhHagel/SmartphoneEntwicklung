@@ -31,7 +31,13 @@ import com.google.gson.JsonParser;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import okhttp3.OkHttpClient;
@@ -46,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageCapture imageCapture;
     private MediaPlayer player;
     private final OkHttpClient client = new OkHttpClient();
+    private final WebSocketClient webSocketClient = new WebSocketClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
 
-        WebSocketClient webSocketClient = new WebSocketClient();
         webSocketClient.setCallback(this);
         webSocketClient.connect(client);
 
@@ -83,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }, getExecutor());
 
-        startInactivityTimeout();
+        //startInactivityTimeout();
 
         // Audio abspielen
         if (player == null) {
@@ -182,25 +188,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
-            stopInactivityTimeout();
+            //stopInactivityTimeout();
 
             // Bild hochladen
-            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", client);
+            //UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", client);
 
             // Hier wird Audio abgespielt (noch nicht da)
             // player = MediaPlayer.create(MainActivity.this, R.raw.phototoserver);
             // player.start();
 
+            // Test Request (funktioniert):
+            webSocketClient.sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"3\"}");
+            Log.d("ServerResponseHandler", "✅ #########################");
+            Log.d("ServerResponseHandler", "✅ #########################");
+            Log.d("ServerResponseHandler", "✅ #########################");
+
             // Nicht erkannt
-            //startActivity(new Intent(this, RecordActivity.class));
+            // startActivity(new Intent(this, RecordActivity.class));
             // ##############################################
             // Erkannt
             // startActivity(new Intent(this, FollowRoboActivity.class));
             // ##############################################
             // erkannt aber kein Termin
-            //startActivity(new Intent(this, RecordTerminActivity.class));
+            // startActivity(new Intent(this, RecordTerminActivity.class));
             // ##############################################
-            startActivity(new Intent(this, AudioPlayActivity.class));
+            // startActivity(new Intent(this, AudioPlayActivity.class));
         });
 
         imageCheckView.setImageURI(Uri.fromFile(photoFile));
@@ -237,7 +249,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private void startInactivityTimeout() {
+    @Override
+    public void onSystemMessageReceived(String systemText) {
+        Log.d("MainActivity", "📨 Systemnachricht: " + systemText);
+    }
+
+    /*private void startInactivityTimeout() {
         if (timeoutRunnable != null) {
             timeoutHandler.removeCallbacks(timeoutRunnable);
         }
@@ -254,11 +271,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void resetInactivityTimeout() {
         startInactivityTimeout();
-    }
+    }*/
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        resetInactivityTimeout();
+        //resetInactivityTimeout();
         return super.dispatchTouchEvent(ev);
     }
 
