@@ -27,6 +27,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
     private Button startBtn;
     private Button stopBtn;
     private MediaPlayer player;
+    private File audioFile;
     private final OkHttpClient client = new OkHttpClient();
     private final WebSocketClient webSocketClient = new WebSocketClient();
 
@@ -46,14 +47,17 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
-        if (player == null) {
-            player = MediaPlayer.create(RecordActivity.this, R.raw.tonaufnehmen);
-            player.start();
+        if (player != null) {
+            player.release();
+            player = null;
         }
+        player = MediaPlayer.create(RecordActivity.this, R.raw.tonaufnehmen);
+        player.start();
+
 
 
         startBtn.setOnClickListener(v -> {
-            String audioFileName = "audio_" + System.currentTimeMillis();
+            String audioFileName = "person-" + System.currentTimeMillis();
             filePath = Objects.requireNonNull(getExternalFilesDir(null)).getAbsolutePath() + "/" + audioFileName + ".m4a";
 
             recorder = new MediaRecorder(this);
@@ -94,15 +98,17 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
             Toast.makeText(this, "✅ Aufnahme gespeichert unter: " + filePath, Toast.LENGTH_SHORT).show(); // nur zum Testen
 
             // Hier wird die Audio zum Server gesendet
-            File audioFile = new File(filePath);
+            audioFile = new File(filePath);
             UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", client);
 
             // Audio abspielen (noch nicht da)
             // Hier wird Audio abgespielt (noch nicht da)
-            if (player == null) {
-                player = MediaPlayer.create(RecordActivity.this, R.raw.audiotoserver);
-                player.start();
+            if (player != null) {
+                player.release();
+                player = null;
             }
+            player = MediaPlayer.create(RecordActivity.this, R.raw.audiotoserver);
+            player.start();
 
         });
 
@@ -167,7 +173,6 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         Button userAcceptBtn = dialog.findViewById(R.id.userAcceptBtn);
 
         userDeleteBtn.setOnClickListener(v -> {
-            File audioFile = new File(filePath);
             if (audioFile.delete()) {
                 webSocketClient.sendMessage("user_declined");
                 Toast.makeText(this, "✅ Person gelöscht. Bitte neu versuchen", Toast.LENGTH_SHORT).show();

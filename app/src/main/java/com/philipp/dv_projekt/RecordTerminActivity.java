@@ -24,6 +24,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     private String filePath;
     private Button startBtn;
     private Button stopBtn;
+    private File audioFile;
     private final OkHttpClient client = new OkHttpClient();
     private final WebSocketClient webSocketClient = new WebSocketClient();
 
@@ -31,6 +32,11 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_termin);
+
+        TextView datumTextView = findViewById(R.id.DatenTextTermin);
+        String text = String.format("Datum: %s%nTag: %s%nZeit: %s",
+                "15.06.2000", "Fr", "15:00");
+        datumTextView.setText(text);
 
         startBtn = findViewById(R.id.btn_start_recording);
         stopBtn = findViewById(R.id.btn_stop_recording);
@@ -43,13 +49,15 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
-        if (player == null) {
-            player = MediaPlayer.create(RecordTerminActivity.this, R.raw.terminannehmen);
-            player.start();
+        if (player != null) {
+            player.release();
+            player = null;
         }
+        player = MediaPlayer.create(RecordTerminActivity.this, R.raw.terminannehmen);
+        player.start();
 
         startBtn.setOnClickListener(v -> {
-            String audioFileName = "audio_" + System.currentTimeMillis();
+            String audioFileName = "command-" + System.currentTimeMillis();
             filePath = Objects.requireNonNull(getExternalFilesDir(null)).getAbsolutePath() + "/" + audioFileName + ".m4a";
 
             recorder = new MediaRecorder(this);
@@ -90,19 +98,15 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
             Toast.makeText(this, "✅ Aufnahme gespeichert unter: " + filePath, Toast.LENGTH_SHORT).show(); // nur zum Testen
 
             // Hier soll die Audio zum Server gesendet werden
-            File audioFile = new File(filePath);
+            audioFile = new File(filePath);
             UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", client);
 
-            if (player == null) {
-                player = MediaPlayer.create(RecordTerminActivity.this, R.raw.audiotoserver);
-                player.start();
+            if (player != null) {
+                player.release();
+                player = null;
             }
-
-            String datum = "15.06.2000";
-            String tag = "Fr";
-            String zeit = "15:00";
-
-            showNewUserData("Datum: " + datum + "\nTag: " + tag + "\nZeit: " + zeit);
+            player = MediaPlayer.create(RecordTerminActivity.this, R.raw.audiotoserver);
+            player.start();
 
         });
 
@@ -126,79 +130,59 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
     @Override
     public void onMessageReceived(String jsonText) {
-        runOnUiThread(() -> {
-            ServerResponseHandler handler = new ServerResponseHandler();
-            ResponseType type = handler.getResponseType(jsonText);
+        player.setOnCompletionListener(mp -> {
+            // Dieser Block wird aufgerufen, sobald die Audiodatei zu Ende gespielt ist:
+            runOnUiThread(() -> {
+                ServerResponseHandler handler = new ServerResponseHandler();
+                ResponseType type = handler.getResponseType(jsonText);
 
-            switch (type) {
-                case DATE_TIME:
-                    DateTimeResponse dateTimeResponse = new Gson().fromJson(jsonText, DateTimeResponse.class);
+                switch (type) {
+                    case DATE_TIME:
+                        DateTimeResponse dateTimeResponse = new Gson().fromJson(jsonText, DateTimeResponse.class);
 
-                    String datum = dateTimeResponse.Date;
-                    String tag = dateTimeResponse.Weekday;
-                    String zeit = dateTimeResponse.Time;
+                        String datum = dateTimeResponse.Date;
+                        String tag = dateTimeResponse.Weekday;
+                        String zeit = dateTimeResponse.Time;
 
-                    showNewUserData("Datum: " + datum + "\nTag: " + tag + "\nZeit: " + zeit);
-                    break;
+                        TextView datumTextView = findViewById(R.id.DatenTextTermin);
+                        String text = String.format("Datum: %s%nTag: %s%nZeit: %s", datum, tag, zeit);
+                        datumTextView.setText(text);
+                        break;
 
-                case TERMIN_INFO:
-                    TerminResponse terminResponse = new Gson().fromJson(jsonText, TerminResponse.class);
-                    String antwort = terminResponse.message;
-                    if (antwort.equals("Nein")) {
-                        Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
-                    } else if (antwort.equals("Ja")) {
-                        Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
-                    } else {
+                    case TERMIN_INFO:
+                        TerminResponse terminResponse = new Gson().fromJson(jsonText, TerminResponse.class);
+                        String antwort = terminResponse.message;
+                        if (antwort.equals("Nein")) {
+                            Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
+                            if (player != null) {
+                                player.release();
+                                player = null;
+                            }
+                            player = MediaPlayer.create(RecordTerminActivity.this, R.raw.abgelehntertermin);
+                            player.start();
+                        } else if (antwort.equals("Ja")) {
+                            Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
+                            if (player != null) {
+                                player.release();
+                                player = null;
+                            }
+                            player = MediaPlayer.create(RecordTerminActivity.this, R.raw.angenommenertermin);
+                            player.start();
+                        } else {
+                            Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+
+                    default:
                         Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-
-                default:
-                    Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
-                    break;
-            }
+                        break;
+                }
+            });
         });
     }
 
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("RecordTerminActivity", "📨 Systemnachricht: " + systemText);
-    }
-
-    private void showNewUserData(String userDataFromServer) {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.layout_new_user);
-
-        TextView textCheckView = dialog.findViewById(R.id.textCheckView);
-        Button userDeleteBtn = dialog.findViewById(R.id.userDeleteBtn);
-        Button userAcceptBtn = dialog.findViewById(R.id.userAcceptBtn);
-
-        userDeleteBtn.setOnClickListener(v -> {
-            webSocketClient.sendMessage("termin_declined");
-            // #################################################
-            // #################################################
-            // #################################################
-            // hier muss noch mit Hendrik gesprochen werden wegen message
-            // #################################################
-            // #################################################
-            // #################################################
-            File audioFile = new File(filePath);
-            if (audioFile.delete()) {
-                Toast.makeText(this, "✅ Audio gelöscht!", Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-            } else {
-                Toast.makeText(this, "❌ Fehler beim Löschen der Audio!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        userAcceptBtn.setOnClickListener(v -> {
-            webSocketClient.sendMessage("termin_accepted");
-            Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
-
-        textCheckView.setText(userDataFromServer);
-
-        dialog.show();
     }
 }

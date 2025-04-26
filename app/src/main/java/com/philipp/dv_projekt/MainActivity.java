@@ -92,10 +92,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //startInactivityTimeout();
 
         // Audio abspielen
-        if (player == null) {
-            player = MediaPlayer.create(MainActivity.this, R.raw.bildaufnehmen);
-            player.start();
+        if (player != null) {
+            player.release();
+            player = null;
         }
+        player = MediaPlayer.create(MainActivity.this, R.raw.bildaufnehmen);
+        player.start();
+
     }
 
     private Executor getExecutor() {
@@ -191,14 +194,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //stopInactivityTimeout();
 
             // Bild hochladen
-            //UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", client);
+            // UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", client);
 
             // Hier wird Audio abgespielt (noch nicht da)
-            // player = MediaPlayer.create(MainActivity.this, R.raw.phototoserver);
-            // player.start();
+            if (player != null) {
+                player.release();
+                player = null;
+            }
+            player = MediaPlayer.create(MainActivity.this, R.raw.phototoserver);
+            player.start();
 
             // Test Request (funktioniert):
-            webSocketClient.sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"3\"}");
+            webSocketClient.sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"1\"}");
             Log.d("ServerResponseHandler", "✅ #########################");
             Log.d("ServerResponseHandler", "✅ #########################");
             Log.d("ServerResponseHandler", "✅ #########################");
@@ -222,30 +229,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onMessageReceived(String jsonText) {
-        runOnUiThread(() -> {
-            ServerResponseHandler handler = new ServerResponseHandler();
-            ResponseType type = handler.getResponseType(jsonText);
+        player.setOnCompletionListener(mp -> {
+            // Dieser Block wird aufgerufen, sobald die Audiodatei zu Ende gespielt ist:
+            runOnUiThread(() -> {
+                ServerResponseHandler handler = new ServerResponseHandler();
+                ResponseType type = handler.getResponseType(jsonText);
 
-            switch (type) {
-                case KNOWN_CUSTOMER:
-                    JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
-                    String appointment = json.has("Appointment") ? json.get("Appointment").getAsString() : "FALSE";
-                    if (appointment.equalsIgnoreCase("TRUE")) {
-                        startActivity(new Intent(this, FollowRoboActivity.class));
-                    } else {
-                        startActivity(new Intent(this, RecordTerminActivity.class));
-                    }
-                    break;
+                switch (type) {
+                    case KNOWN_CUSTOMER:
+                        JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
+                        String appointment = json.has("Appointment") ? json.get("Appointment").getAsString() : "FALSE";
+                        if (appointment.equalsIgnoreCase("TRUE")) {
+                            startActivity(new Intent(this, FollowRoboActivity.class));
+                        } else {
+                            startActivity(new Intent(this, RecordTerminActivity.class));
+                        }
+                        break;
 
-                case UNKNOWN_CUSTOMER:
-                    startActivity(new Intent(this, RecordActivity.class));
-                    break;
+                    case UNKNOWN_CUSTOMER:
+                        startActivity(new Intent(this, RecordActivity.class));
+                        break;
 
-                default:
-                    Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
-            }
+                    default:
+                        Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+                }
 
-            finish();
+                finish();
+            });
         });
     }
 

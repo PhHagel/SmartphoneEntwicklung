@@ -18,20 +18,21 @@ public class SmartphoneBackActivity extends AppCompatActivity {
 
 
         // Audio abspielen
-        if (player == null) {
-            player = MediaPlayer.create(SmartphoneBackActivity.this, R.raw.smartphonezurueklegen);
-
-            // Setze OnCompletionListener, um auf das Ende des Audios zu warten
-            player.setOnCompletionListener(mediaPlayer -> {
-
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    Intent intent = new Intent(SmartphoneBackActivity.this, SplashActivity.class);
-                    startActivity(intent);
-                    finish();
-                }, 5000); // 5 Sekunden warten
-            });
-
-            player.start();
+        if (player != null) {
+            player.release();
+            player = null;
         }
+        player = MediaPlayer.create(SmartphoneBackActivity.this, R.raw.smartphonezurueklegen);
+        player.start();
+
+        // Setze OnCompletionListener, um auf das Ende des Audios zu warten
+        player.setOnCompletionListener(mp -> {
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                Intent intent = new Intent(SmartphoneBackActivity.this, SplashActivity.class);
+                startActivity(intent);
+                finish();
+            }, 5000); // 5 Sekunden warten
+        });
     }
 }

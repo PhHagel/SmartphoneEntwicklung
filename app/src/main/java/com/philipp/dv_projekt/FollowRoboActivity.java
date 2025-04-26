@@ -32,17 +32,19 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
             ResponseType type = handler.getResponseType(jsonText);
 
             if (Objects.requireNonNull(type) == ResponseType.ROBOT_REACHED_GOAL) {
-                if (player == null) {
-                    player = MediaPlayer.create(FollowRoboActivity.this, R.raw.roboterfolgen);
-
-                    player.setOnCompletionListener(mediaPlayer -> {
-                        Intent intentSmartphoneBackActivity = new Intent(FollowRoboActivity.this, SmartphoneBackActivity.class);
-                        startActivity(intentSmartphoneBackActivity);
-                        finish();
-                    });
-
-                    player.start();
+                if (player != null) {
+                    player.release();
+                    player = null;
                 }
+                player = MediaPlayer.create(FollowRoboActivity.this, R.raw.roboterfolgen);
+                player.start();
+
+                player.setOnCompletionListener(mediaPlayer -> {
+                    Intent intentSmartphoneBackActivity = new Intent(FollowRoboActivity.this, SmartphoneBackActivity.class);
+                    startActivity(intentSmartphoneBackActivity);
+                    finish();
+                });
+
             } else {
                 Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
             }
