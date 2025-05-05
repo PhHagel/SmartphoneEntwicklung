@@ -1,9 +1,7 @@
 package com.philipp.dv_projekt;
 
 import androidx.annotation.NonNull;
-
 import com.google.gson.JsonSyntaxException;
-
 import okhttp3.*;
 
 public class WebSocketClient {
@@ -15,11 +13,12 @@ public class WebSocketClient {
         this.callback = callback;
     }
 
-    public void connect(OkHttpClient client) {
-
+    public void connect() {
+        // Holt den Client direkt aus dem Singleton
+        OkHttpClient client = OkHttpManager.getInstance();
 
         Request request = new Request.Builder()
-                .url("ws://192.168.10.128:3001") // ← IP des Servers samt port
+                .url("ws://192.168.10.128:3001")  // ← IP des Servers samt Port
                 .build();
 
         webSocket = client.newWebSocket(request, new WebSocketListener() {
@@ -33,7 +32,7 @@ public class WebSocketClient {
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
                 System.out.println("📨 Nachricht empfangen: " + text);
 
-                // Hier werden die Systemnachrichten gefiltert
+                // Systemnachrichten filtern
                 if (!text.trim().startsWith("{")) {
                     if (callback != null) {
                         callback.onSystemMessageReceived(text);
@@ -45,14 +44,11 @@ public class WebSocketClient {
                     callback.onMessageReceived(text);
                 }
 
-                // Hier wird die Nachricht an den ServerResponseHandler weitergegeben
                 try {
                     ServerResponseHandler handler = new ServerResponseHandler();
                     handler.getResponseType(text);
-
                 } catch (JsonSyntaxException e) {
                     System.out.println("⚠️ Ungültiges JSON: " + text);
-
                 } catch (IllegalStateException e) {
                     System.out.println("⚠️ JSON ist kein Objekt: " + text);
                 }
@@ -63,7 +59,6 @@ public class WebSocketClient {
                 System.out.println("❌ Fehler: " + t.getMessage());
             }
         });
-
     }
 
     public void sendMessage(String message) {

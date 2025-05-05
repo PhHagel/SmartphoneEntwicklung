@@ -10,7 +10,7 @@ import java.io.IOException;
 public class AudioPlayActivity extends AppCompatActivity {
 
     private MediaPlayer player;
-    private static final String AUDIO_URL = "http://192.168.10.128:3000/upload/sprache/ausrufUser.mp3";
+    private static final String AUDIO_URL = "http://192.168.10.128:3000/uploads/sprache/ausrufUser.mp3";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +46,8 @@ public class AudioPlayActivity extends AppCompatActivity {
             Toast.makeText(this, "Fehler beim Starten: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
+    // hier muss noch ein onMessageReceived rein, um zu sagen, dass wenn Roboter-Reached-Goal --> auf den Smartphone zurücklegen Screen verweisen...
 
     @Override
     protected void onDestroy() {

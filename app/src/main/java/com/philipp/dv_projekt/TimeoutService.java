@@ -14,7 +14,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 public class TimeoutService extends Service {
 
 
-    private static final long TIMEOUT_IN_MILLIS = 10_000;  // 30 Sekunden später
+    private static final long TIMEOUT_IN_MILLIS = 30_000;  // 30 Sekunden später
     private Handler timeoutHandler;
     private Runnable timeoutRunnable;
 

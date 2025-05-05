@@ -32,7 +32,6 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, WebSocketCallback {
 
@@ -41,8 +40,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PreviewView previewView;
     private ImageCapture imageCapture;
     private MediaPlayer player;
-    private final OkHttpClient client = new OkHttpClient();
-    private final WebSocketClient webSocketClient = new WebSocketClient();
 
 
     @Override
@@ -52,8 +49,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
 
-        webSocketClient.setCallback(this);
-        webSocketClient.connect(client);
+        WebSocketManager.getInstance().setCallback(this);
+        WebSocketManager.getInstance().connect();
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
@@ -189,22 +186,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
-            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", client);
+            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", OkHttpManager.getInstance());
 
             stopService(new Intent(this, TimeoutService.class));
 
             if (player != null) {
+
                 player.release();
                 player = null;
+
             }
+
             player = MediaPlayer.create(MainActivity.this, R.raw.phototoserver);
             player.start();
 
-            // Test Request (funktioniert):
-            webSocketClient.sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"3\"}");
-            Log.d("ServerResponseHandler", "✅ #########################");
-            Log.d("ServerResponseHandler", "✅ #########################");
-            Log.d("ServerResponseHandler", "✅ #########################");
+            stopService(new Intent(this, TimeoutService.class));
+
         });
     }
 
@@ -213,36 +210,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onMessageReceived(String jsonText) {
 
-        stopService(new Intent(this, TimeoutService.class));
+        runOnUiThread(() -> {
+            ServerResponseHandler handler = new ServerResponseHandler();
+            ResponseType type = handler.getResponseType(jsonText);
+            Log.d("ServerResponseHandler", "✅ #########################");
+            Log.d("ServerResponseHandler", type.toString());
+            Log.d("ServerResponseHandler", "✅ #########################");
 
-        player.setOnCompletionListener(mp -> {
-            // Dieser Block wird aufgerufen, sobald die Audiodatei zu Ende gespielt ist:
-            runOnUiThread(() -> {
-                ServerResponseHandler handler = new ServerResponseHandler();
-                ResponseType type = handler.getResponseType(jsonText);
+            if (player.isPlaying()) {
 
-                switch (type) {
-                    case KNOWN_CUSTOMER:
-                        JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
-                        String appointment = json.has("Appointment") ? json.get("Appointment").getAsString() : "FALSE";
-                        if (appointment.equalsIgnoreCase("TRUE")) {
-                            startActivity(new Intent(this, FollowRoboActivity.class));
-                        } else {
-                            startActivity(new Intent(this, RecordTerminActivity.class));
-                        }
-                        break;
+                player.setOnCompletionListener(mp -> handleServerResponse(type, jsonText));
 
-                    case UNKNOWN_CUSTOMER:
-                        startActivity(new Intent(this, RecordActivity.class));
-                        break;
+            } else {
 
-                    default:
-                        Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
-                }
+                handleServerResponse(type, jsonText);
 
-                finish();
-            });
+            }
+
         });
+
+    }
+
+    private void  handleServerResponse(ResponseType type, String jsonText) {
+
+        switch (type) {
+
+            case KNOWN_CUSTOMER:
+                JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
+                String appointment = json.has("Appointment") ? json.get("Appointment").getAsString() : "FALSE";
+                if (appointment.equalsIgnoreCase("TRUE")) {
+                    startActivity(new Intent(this, FollowRoboActivity.class));
+                } else {
+                    startActivity(new Intent(this, RecordTerminActivity.class));
+                }
+                break;
+
+            case UNKNOWN_CUSTOMER:
+                startActivity(new Intent(this, RecordActivity.class));
+                break;
+
+            default:
+                Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+        }
+
+        finish();
     }
 
 

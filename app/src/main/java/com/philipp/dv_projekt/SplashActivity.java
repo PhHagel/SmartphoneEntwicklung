@@ -58,6 +58,8 @@ public class SplashActivity extends AppCompatActivity implements SensorEventList
         sensorManager.unregisterListener(this);
     }
 
+    // hier muss noch ein on message ressived rein, um die Activity zu beenden wenn eine audio vom Server kommt!!!
+
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (switched) return;

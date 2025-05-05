@@ -16,7 +16,6 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-import okhttp3.OkHttpClient;
 
 public class RecordActivity extends AppCompatActivity implements WebSocketCallback {
 
@@ -27,8 +26,6 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
     private Button stopBtn;
     private MediaPlayer player;
     private File audioFile;
-    private final OkHttpClient client = new OkHttpClient();
-    private final WebSocketClient webSocketClient = new WebSocketClient();
 
 
     @Override
@@ -42,8 +39,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
 
         stopBtn.setEnabled(false);
 
-        webSocketClient.setCallback(this);
-        webSocketClient.connect(client);
+        WebSocketManager.getInstance().setCallback(this);
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
@@ -105,7 +101,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
 
             // Hier wird die Audio zum Server gesendet
             audioFile = new File(filePath);
-            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", client);
+            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", OkHttpManager.getInstance());
 
             // Audio abspielen (noch nicht da)
             // Hier wird Audio abgespielt (noch nicht da)
@@ -140,33 +136,53 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
     @Override
     public void onMessageReceived(String jsonText) {
 
-        stopService(new Intent(this, TimeoutService.class));
-
         runOnUiThread(() -> {
             ServerResponseHandler handler = new ServerResponseHandler();
             ResponseType type = handler.getResponseType(jsonText);
+            Log.d("ServerResponseHandler", "✅ #########################");
+            Log.d("ServerResponseHandler", type.toString());
+            Log.d("ServerResponseHandler", "✅ #########################");
 
-            switch (type) {
-                case PERSON_DATA:
-                    PersonResponse person = new Gson().fromJson(jsonText, PersonResponse.class);
-                    String nachname = person.message.lastname;
-                    String vorname = person.message.firstname;
-                    String geschlecht = person.message.sex;
-                    String geburtsdatum = person.message.dateOfBirth;
-                    String telefon = person.message.phoneNumber;
-                    String email = person.message.emailAddress; //schauen wegen @
-                    showNewUserData("Nachname: " + nachname + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
-                            "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telefon + "\nE-Mail: " + email);
-                    break;
+            if (player.isPlaying()) {
 
-                case PERSON_DATA_SUCCESS_FALSE:
-                    Toast .makeText(this, "❌ Personendaten nicht erfolgreich neu versuchen", Toast.LENGTH_SHORT).show();
-                    break;
+                player.setOnCompletionListener(mp -> handleServerResponse(type, jsonText));
 
-                default:
-                    Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+            } else {
+
+                handleServerResponse(type, jsonText);
+
             }
+
         });
+
+    }
+
+
+    private void  handleServerResponse(ResponseType type, String jsonText) {
+
+        stopService(new Intent(this, TimeoutService.class));
+
+        switch (type) {
+            case PERSON_DATA:
+                PersonResponse person = new Gson().fromJson(jsonText, PersonResponse.class);
+                String nachname = person.message.lastname;
+                String vorname = person.message.firstname;
+                String geschlecht = person.message.sex;
+                String geburtsdatum = person.message.dateOfBirth;
+                String telefon = person.message.phoneNumber;
+                String email = person.message.emailAddress; //schauen wegen @
+                showNewUserData("Nachname: " + nachname + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
+                        "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telefon + "\nE-Mail: " + email);
+                break;
+
+            case PERSON_DATA_SUCCESS_FALSE:
+                Toast .makeText(this, "❌ Personendaten nicht erfolgreich neu versuchen", Toast.LENGTH_SHORT).show();
+                break;
+
+            default:
+                Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 
@@ -186,7 +202,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
 
         userDeleteBtn.setOnClickListener(v -> {
             if (audioFile.delete()) {
-                webSocketClient.sendMessage("user_declined");
+                WebSocketManager.getInstance().sendMessage("user_declined");
                 Toast.makeText(this, "✅ Person gelöscht. Bitte neu versuchen", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             } else {
@@ -195,7 +211,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         });
 
         userAcceptBtn.setOnClickListener(v -> {
-            webSocketClient.sendMessage("user_accepted");
+            WebSocketManager.getInstance().sendMessage("user_accepted");
             Toast.makeText(this, "✅ Person akzeptiert!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, RecordTerminActivity.class));
             dialog.dismiss();

@@ -17,7 +17,6 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-import okhttp3.OkHttpClient;
 
 public class RecordTerminActivity extends AppCompatActivity implements WebSocketCallback {
     private MediaRecorder recorder;
@@ -26,8 +25,6 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     private Button startBtn;
     private Button stopBtn;
     private File audioFile;
-    private final OkHttpClient client = new OkHttpClient();
-    private final WebSocketClient webSocketClient = new WebSocketClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +42,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         stopBtn.setEnabled(false);
 
-        webSocketClient.setCallback(this);
-        webSocketClient.connect(client);
+        WebSocketManager.getInstance().setCallback(this);
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
@@ -108,7 +104,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
             // Hier soll die Audio zum Server gesendet werden
             audioFile = new File(filePath);
-            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", client);
+            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", OkHttpManager.getInstance());
 
             if (player != null) {
                 player.release();
@@ -141,58 +137,63 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
     @Override
     public void onMessageReceived(String jsonText) {
-        player.setOnCompletionListener(mp -> {
-            // Dieser Block wird aufgerufen, sobald die Audiodatei zu Ende gespielt ist:
-            runOnUiThread(() -> {
-                ServerResponseHandler handler = new ServerResponseHandler();
-                ResponseType type = handler.getResponseType(jsonText);
-
-                switch (type) {
-                    case DATE_TIME:
-                        DateTimeResponse dateTimeResponse = new Gson().fromJson(jsonText, DateTimeResponse.class);
-
-                        String datum = dateTimeResponse.Date;
-                        String tag = dateTimeResponse.Weekday;
-                        String zeit = dateTimeResponse.Time;
-
-                        TextView datumTextView = findViewById(R.id.DatenTextTermin);
-                        String text = String.format("Datum: %s%nTag: %s%nZeit: %s", datum, tag, zeit);
-                        datumTextView.setText(text);
-                        break;
-
-                    case TERMIN_INFO:
-                        TerminResponse terminResponse = new Gson().fromJson(jsonText, TerminResponse.class);
-                        String antwort = terminResponse.message;
-                        if (antwort.equals("Nein")) {
-                            Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
-                            if (player != null) {
-                                player.release();
-                                player = null;
-                            }
-                            player = MediaPlayer.create(RecordTerminActivity.this, R.raw.abgelehntertermin);
-                            player.start();
-
-
-
-                        } else if (antwort.equals("Ja")) {
-                            Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
-                            if (player != null) {
-                                player.release();
-                                player = null;
-                            }
-                            player = MediaPlayer.create(RecordTerminActivity.this, R.raw.angenommenertermin);
-                            player.start();
-                        } else {
-                            Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-
-                    default:
-                        Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            });
+        runOnUiThread(() -> {
+            if (player != null && player.isPlaying()) {
+                // Noch am Abspielen -> warten bis es fertig ist
+                player.setOnCompletionListener(mp -> handleMessageResponse(jsonText));
+            } else {
+                // Schon fertig -> direkt ausführen
+                handleMessageResponse(jsonText);
+            }
         });
+    }
+
+    private void handleMessageResponse(String jsonText) {
+        stopService(new Intent(this, TimeoutService.class));
+
+        ServerResponseHandler handler = new ServerResponseHandler();
+        ResponseType type = handler.getResponseType(jsonText);
+
+        switch (type) {
+            case DATE_TIME:
+                DateTimeResponse dateTimeResponse = new Gson().fromJson(jsonText, DateTimeResponse.class);
+
+                String datum = dateTimeResponse.Date;
+                String tag = dateTimeResponse.Weekday;
+                String zeit = dateTimeResponse.Time;
+
+                TextView datumTextView = findViewById(R.id.DatenTextTermin);
+                String text = String.format("Datum: %s%nTag: %s%nZeit: %s", datum, tag, zeit);
+                datumTextView.setText(text);
+                break;
+
+            case TERMIN_INFO:
+                TerminResponse terminResponse = new Gson().fromJson(jsonText, TerminResponse.class);
+                String antwort = terminResponse.message;
+                if ("Nein".equals(antwort)) {
+                    Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
+                    resetAndPlay(R.raw.abgelehntertermin);
+                } else if ("Ja".equals(antwort)) {
+                    Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
+                    resetAndPlay(R.raw.angenommenertermin);
+                } else {
+                    Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            default:
+                Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    private void resetAndPlay(int rawResourceId) {
+        if (player != null) {
+            player.release();
+            player = null;
+        }
+        player = MediaPlayer.create(this, rawResourceId);
+        player.start();
     }
 
     @Override
