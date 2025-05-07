@@ -2,8 +2,10 @@ package com.philipp.dv_projekt;
 
 public enum ResponseType {
     ROBOT_REACHED_GOAL,
+    AUDIO_GENERATION_REQUEST_SUCCESS,
     KNOWN_CUSTOMER,
     UNKNOWN_CUSTOMER,
+    FAILURE,
     PERSON_DATA,
     PERSON_DATA_SUCCESS_FALSE,
     TERMIN_INFO,

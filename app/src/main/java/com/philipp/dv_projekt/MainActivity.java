@@ -212,18 +212,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         runOnUiThread(() -> {
             ServerResponseHandler handler = new ServerResponseHandler();
-            ResponseType type = handler.getResponseType(jsonText);
+            ResponseResult result = handler.getResponseType(jsonText);
             Log.d("ServerResponseHandler", "✅ #########################");
-            Log.d("ServerResponseHandler", type.toString());
+            Log.d("ServerResponseHandler", result.getMessage());
             Log.d("ServerResponseHandler", "✅ #########################");
 
             if (player.isPlaying()) {
 
-                player.setOnCompletionListener(mp -> handleServerResponse(type, jsonText));
+                player.setOnCompletionListener(mp -> handleServerResponse(result, jsonText));
 
             } else {
 
-                handleServerResponse(type, jsonText);
+                handleServerResponse(result, jsonText);
 
             }
 
@@ -231,9 +231,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void  handleServerResponse(ResponseType type, String jsonText) {
+    private void  handleServerResponse(ResponseResult result, String jsonText) {
 
-        switch (type) {
+        switch (result.getType()) {
 
             case KNOWN_CUSTOMER:
                 JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();

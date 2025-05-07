@@ -137,26 +137,26 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
     @Override
     public void onMessageReceived(String jsonText) {
+        ServerResponseHandler handler = new ServerResponseHandler();
+        ResponseResult result = handler.getResponseType(jsonText);
+
         runOnUiThread(() -> {
             if (player != null && player.isPlaying()) {
                 // Noch am Abspielen -> warten bis es fertig ist
-                player.setOnCompletionListener(mp -> handleMessageResponse(jsonText));
+                player.setOnCompletionListener(mp -> handleMessageResponse(result));
             } else {
                 // Schon fertig -> direkt ausführen
-                handleMessageResponse(jsonText);
+                handleMessageResponse(result);
             }
         });
     }
 
-    private void handleMessageResponse(String jsonText) {
+    private void handleMessageResponse(ResponseResult result) {
         stopService(new Intent(this, TimeoutService.class));
 
-        ServerResponseHandler handler = new ServerResponseHandler();
-        ResponseType type = handler.getResponseType(jsonText);
-
-        switch (type) {
+        switch (result.getType()) {
             case DATE_TIME:
-                DateTimeResponse dateTimeResponse = new Gson().fromJson(jsonText, DateTimeResponse.class);
+                DateTimeResponse dateTimeResponse = new Gson().fromJson(result.getMessage(), DateTimeResponse.class);
 
                 String datum = dateTimeResponse.Date;
                 String tag = dateTimeResponse.Weekday;
@@ -168,7 +168,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 break;
 
             case TERMIN_INFO:
-                TerminResponse terminResponse = new Gson().fromJson(jsonText, TerminResponse.class);
+                TerminResponse terminResponse = new Gson().fromJson(result.getMessage(), TerminResponse.class);
                 String antwort = terminResponse.message;
                 if ("Nein".equals(antwort)) {
                     Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();

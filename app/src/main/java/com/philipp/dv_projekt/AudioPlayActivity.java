@@ -3,11 +3,12 @@ package com.philipp.dv_projekt;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 
-public class AudioPlayActivity extends AppCompatActivity {
+public class AudioPlayActivity extends AppCompatActivity implements WebSocketCallback {
 
     private MediaPlayer player;
     private static final String AUDIO_URL = "http://192.168.10.128:3000/uploads/sprache/ausrufUser.mp3";
@@ -56,5 +57,15 @@ public class AudioPlayActivity extends AppCompatActivity {
             player.release();
             player = null;
         }
+    }
+
+    @Override
+    public void onMessageReceived(String jsonText) {
+        // hier muss nach robot_reached_goal gecheckt werden
+    }
+
+    @Override
+    public void onSystemMessageReceived(String systemText) {
+        Log.d("AudioPlayActivity", "📨 Systemnachricht: " + systemText);
     }
 }

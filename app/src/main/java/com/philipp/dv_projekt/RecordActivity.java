@@ -138,18 +138,18 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
 
         runOnUiThread(() -> {
             ServerResponseHandler handler = new ServerResponseHandler();
-            ResponseType type = handler.getResponseType(jsonText);
+            ResponseResult result = handler.getResponseType(jsonText);
             Log.d("ServerResponseHandler", "✅ #########################");
-            Log.d("ServerResponseHandler", type.toString());
+            Log.d("ServerResponseHandler", result.toString());
             Log.d("ServerResponseHandler", "✅ #########################");
 
             if (player.isPlaying()) {
 
-                player.setOnCompletionListener(mp -> handleServerResponse(type, jsonText));
+                player.setOnCompletionListener(mp -> handleServerResponse(result, jsonText));
 
             } else {
 
-                handleServerResponse(type, jsonText);
+                handleServerResponse(result, jsonText);
 
             }
 
@@ -158,11 +158,11 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
     }
 
 
-    private void  handleServerResponse(ResponseType type, String jsonText) {
+    private void  handleServerResponse(ResponseResult result, String jsonText) {
 
         stopService(new Intent(this, TimeoutService.class));
 
-        switch (type) {
+        switch (result.getType()) {
             case PERSON_DATA:
                 PersonResponse person = new Gson().fromJson(jsonText, PersonResponse.class);
                 String nachname = person.message.lastname;
@@ -180,6 +180,8 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
                 break;
 
             default:
+                Log.d("RecordActivity", "❓ Unbekannter Type vom Server: " + result.getType());
+                Log.d("RecordActivity", "❓ Unbekannte Antwort vom Server: " + jsonText);
                 Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
         }
 

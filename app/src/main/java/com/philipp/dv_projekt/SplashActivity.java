@@ -13,11 +13,11 @@ import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
-
+import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 @SuppressLint("CustomSplashScreen")
-public class SplashActivity extends AppCompatActivity implements SensorEventListener {
+public class SplashActivity extends AppCompatActivity implements SensorEventListener, WebSocketCallback {
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -84,5 +84,15 @@ public class SplashActivity extends AppCompatActivity implements SensorEventList
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Wird nicht benötigt
+    }
+
+    @Override
+    public void onMessageReceived(String jsonText) {
+        // Hier muss nach ausrufen gecheckt werden
+    }
+
+    @Override
+    public void onSystemMessageReceived(String systemText) {
+        Log.d("SplashActivity", "📨 Systemnachricht: " + systemText);
     }
 }

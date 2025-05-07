@@ -37,22 +37,24 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
 
     @Override
     public void onMessageReceived(String jsonText) {
+        ServerResponseHandler handler = new ServerResponseHandler();
+        ResponseResult result = handler.getResponseType(jsonText);
+
         runOnUiThread(() -> {
             if (player != null && player.isPlaying()) {
                 // Noch am Abspielen -> warten bis es fertig ist
-                player.setOnCompletionListener(mp -> handleMessageResponse(jsonText));
+                player.setOnCompletionListener(mp -> handleMessageResponse(result));
             } else {
                 // Schon fertig -> direkt ausführen
-                handleMessageResponse(jsonText);
+                handleMessageResponse(result);
             }
         });
     }
 
-    private void handleMessageResponse(String jsonText) {
-        ServerResponseHandler handler = new ServerResponseHandler();
-        ResponseType type = handler.getResponseType(jsonText);
+    private void handleMessageResponse(ResponseResult result) {
 
-        if (Objects.requireNonNull(type) == ResponseType.ROBOT_REACHED_GOAL) {
+
+        if (Objects.requireNonNull(result.getType()) == ResponseType.ROBOT_REACHED_GOAL) {
             Intent intentSmartphoneBackActivity = new Intent(FollowRoboActivity.this, SmartphoneBackActivity.class);
             startActivity(intentSmartphoneBackActivity);
             finish();
