@@ -8,82 +8,87 @@ public class ServerResponseHandler {
 
     public ResponseResult getResponseType(String jsonString) {
         try {
+
             JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
-            String message = json.get("message").getAsString();
 
             if (json.has("type")) {
                 String type = json.get("type").getAsString();
 
                 switch (type) {
-                    case "Robot_reached_Goal":
-                        Log.d("ServerResponseHandler", "✅ 9999999999999999");
-                        Log.d("ServerResponseHandler", "✅ 9999999999999999");
-                        Log.d("ServerResponseHandler", "✅ 9999999999999999");
-                        return new ResponseResult(ResponseType.ROBOT_REACHED_GOAL, null);
 
-                    case "Audio_Generation_Request_Success":
-                        Log.d("ServerResponseHandler", "✅ 88888888888888");
-                        Log.d("ServerResponseHandler", "✅ 88888888888888");
-                        Log.d("ServerResponseHandler", "✅ 88888888888888");
+
+                    case "AUDIO_GENERATION_REQUEST_FAILURE":
+                        if (json.has("message")) {
+                            String message = json.get("message").getAsString();
+                            return new ResponseResult(ResponseType.AUDIO_GENERATION_REQUEST_FAILURE, message);
+                        }
+                        return new ResponseResult(ResponseType.FAILURE, "Keine Message in AUDIO_GENERATION_REQUEST_FAILURE vorhanden");
+
+
+                    case "AUDIO_GENERATION_REQUEST_SUCCESS":
                         return new ResponseResult(ResponseType.AUDIO_GENERATION_REQUEST_SUCCESS, null);
 
-                    case "Known_Customer":
-                        Log.d("ServerResponseHandler", "✅ 88888888888888");
-                        Log.d("ServerResponseHandler", "✅ 88888888888888");
-                        Log.d("ServerResponseHandler", "✅ 88888888888888");
-                        return new ResponseResult(ResponseType.KNOWN_CUSTOMER, null);
 
-                    case "Unknown_Customer":
-                        Log.d("ServerResponseHandler", "✅ 77777777777777");
-                        Log.d("ServerResponseHandler", "✅ 77777777777777");
-                        Log.d("ServerResponseHandler", "✅ 77777777777777");
+                    case "FAILURE":  //genereller fehler evtl für timeouts
+                        if (json.has("message")) {
+                            String message = json.get("message").getAsString();
+                            return new ResponseResult(ResponseType.FAILURE, message);
+                        }
+                        return new ResponseResult(ResponseType.FAILURE, "Keine Message vorhanden");
+
+
+                    case "KNOWN_CUSTOMER":
+                        if (json.has("appointment")) {
+                            boolean appointment = json.get("appointment").getAsBoolean();
+                            if (appointment) {
+                                return new ResponseResult(ResponseType.KNOWN_CUSTOMER, null);
+                            } else {
+                                return new ResponseResult(ResponseType.KNOWN_CUSTOMER_WITHOUT_APPOINTMENT, null);
+                            }
+                        }
+                        return new ResponseResult(ResponseType.FAILURE, "appointment fehlt in KNOWN_CUSTOMER");
+
+
+                    case "NEXT_APPOINTMENT":
+                        return new ResponseResult(ResponseType.NEXT_APPOINTMENT, null);
+
+
+                    case "PERSON_DATA":
+                        if (json.has("success")) {
+                            boolean success = json.get("success").getAsBoolean();
+                            if (success) {
+                                return new ResponseResult(ResponseType.PERSON_DATA, null);
+                            } else {
+                                return new ResponseResult(ResponseType.PERSON_DATA_SUCCESS_FALSE, null);
+                            }
+                        }
+                        return new ResponseResult(ResponseType.FAILURE, "success fehlt in PERSON_DATA");
+
+
+                    case "ROBOTER_REACHED_GOAL":
+                        return new ResponseResult(ResponseType.ROBOT_REACHED_GOAL, null);
+
+
+                    case "TERMIN_INFO":
+                        return new ResponseResult(ResponseType.TERMIN_INFO, null);
+
+
+                    case "UNKNOWN_CUSTOMER":
                         return new ResponseResult(ResponseType.UNKNOWN_CUSTOMER, null);
 
-                    case "FAILURE":
-                        message = json.get("message").getAsString();
-                        return new ResponseResult(ResponseType.FAILURE, message);
 
                     default:
-                        Log.d("ServerResponseHandler", "✅ 6666666666666666");
-                        Log.d("ServerResponseHandler", "✅ 6666666666666666");
-                        Log.d("ServerResponseHandler", "✅ 6666666666666666");
-                        return new ResponseResult(ResponseType.UNKNOWN, message);
+                        return new ResponseResult(ResponseType.UNKNOWN_RESPONSE, "Type nicht vorhanden, oder noch nicht implementiert");
+
+
                 }
-
-            } else if (json.has("Success") && json.get("Success").getAsString().equals("TRUE") && json.get("message").isJsonObject()) {
-                Log.d("ServerResponseHandler", "✅ 111111111111111111");
-                Log.d("ServerResponseHandler", "✅ 111111111111111111");
-                Log.d("ServerResponseHandler", "✅ 111111111111111111");
-                return new ResponseResult(ResponseType.PERSON_DATA, null);
-
-            } else if (json.has("Success") && json.get("Success").getAsString().equals("FALSE")) {
-                Log.d("ServerResponseHandler", "✅ 2222222222222222");
-                Log.d("ServerResponseHandler", "✅ 2222222222222222");
-                Log.d("ServerResponseHandler", "✅ 2222222222222222");
-                return new ResponseResult(ResponseType.PERSON_DATA_SUCCESS_FALSE, null);
-
-            } else if (json.has("Success") && json.get("message").isJsonPrimitive()) {
-                Log.d("ServerResponseHandler", "✅ 3333333333333333");
-                Log.d("ServerResponseHandler", "✅ 3333333333333333");
-                Log.d("ServerResponseHandler", "✅ 3333333333333333");
-                return new ResponseResult(ResponseType.TERMIN_INFO, null);
-
-            } else if (json.has("Date") && json.has("Time") && json.has("Weekday")) {
-                Log.d("ServerResponseHandler", "✅ 4444444444444444");
-                Log.d("ServerResponseHandler", "✅ 4444444444444444");
-                Log.d("ServerResponseHandler", "✅ 4444444444444444");
-                return new ResponseResult(ResponseType.DATE_TIME, null);
-
             } else {
-                Log.d("ServerResponseHandler", "✅ 5555555555555555");
-                Log.d("ServerResponseHandler", "✅ 5555555555555555");
-                Log.d("ServerResponseHandler", "✅ 5555555555555555");
-                return new ResponseResult(ResponseType.UNKNOWN, null);
+                return new ResponseResult(ResponseType.UNKNOWN_RESPONSE, "Kein Type vorhanden");
             }
 
         } catch (Exception e) {
-            Log.d("ServerResponseHandler", "⚠️ 1010101010101010101010");
-            return new ResponseResult(ResponseType.UNKNOWN, null);
+            Log.e("ServerResponseHandler", "Exception beim Parsen des JSON!", e);
+            return new ResponseResult(ResponseType.UNKNOWN_RESPONSE, "Exception beim JSON-Parsing: " + e.getMessage());
         }
     }
 }

@@ -186,7 +186,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
-            UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", OkHttpManager.getInstance());
+            //UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", OkHttpManager.getInstance());
+
+            WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"1\"}");
 
             stopService(new Intent(this, TimeoutService.class));
 
@@ -213,9 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         runOnUiThread(() -> {
             ServerResponseHandler handler = new ServerResponseHandler();
             ResponseResult result = handler.getResponseType(jsonText);
-            Log.d("ServerResponseHandler", "✅ #########################");
-            Log.d("ServerResponseHandler", result.getMessage());
-            Log.d("ServerResponseHandler", "✅ #########################");
+
 
             if (player.isPlaying()) {
 
@@ -236,6 +236,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (result.getType()) {
 
             case KNOWN_CUSTOMER:
+                Log.d("MainActivity", "✅ Kunde bekannt");
+                Log.d("MainActivity", jsonText);
+                Log.d("MainActivity", "✅ Kunde bekannt");
                 JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
                 String appointment = json.has("Appointment") ? json.get("Appointment").getAsString() : "FALSE";
                 if (appointment.equalsIgnoreCase("TRUE")) {

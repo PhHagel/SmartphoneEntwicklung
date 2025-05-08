@@ -155,7 +155,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         stopService(new Intent(this, TimeoutService.class));
 
         switch (result.getType()) {
-            case DATE_TIME:
+            case NEXT_APPOINTMENT:
                 DateTimeResponse dateTimeResponse = new Gson().fromJson(result.getMessage(), DateTimeResponse.class);
 
                 String datum = dateTimeResponse.Date;
