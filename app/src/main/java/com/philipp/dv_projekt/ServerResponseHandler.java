@@ -28,6 +28,8 @@ public class ServerResponseHandler {
                     case "AUDIO_GENERATION_REQUEST_SUCCESS":
                         return new ResponseResult(ResponseType.AUDIO_GENERATION_REQUEST_SUCCESS, null);
 
+                    case "EXTRACT_DATA_FROM_AUDIO_SUCCESS":
+                        return new ResponseResult(ResponseType.EXTRACT_DATA_FROM_AUDIO_SUCCESS, null);
 
                     case "FAILURE":  //genereller fehler evtl für timeouts
                         if (json.has("message")) {
@@ -71,6 +73,9 @@ public class ServerResponseHandler {
 
                     case "TERMIN_INFO":
                         return new ResponseResult(ResponseType.TERMIN_INFO, null);
+
+                    case "TIMEOUT":
+                        return new ResponseResult(ResponseType.FAILURE, "Timeout vom Server erhalten");
 
 
                     case "UNKNOWN_CUSTOMER":
