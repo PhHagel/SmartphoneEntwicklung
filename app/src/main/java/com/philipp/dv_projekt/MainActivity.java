@@ -236,9 +236,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (result.getType()) {
 
             case KNOWN_CUSTOMER:
-                Log.d("MainActivity", "✅ Kunde bekannt");
-                Log.d("MainActivity", jsonText);
-                Log.d("MainActivity", "✅ Kunde bekannt");
                 JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
                 String appointment = json.has("Appointment") ? json.get("Appointment").getAsString() : "FALSE";
                 if (appointment.equalsIgnoreCase("TRUE")) {
@@ -246,6 +243,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     startActivity(new Intent(this, RecordTerminActivity.class));
                 }
+                break;
+
+            case KNOWN_CUSTOMER_WITHOUT_APPOINTMENT:
+                startActivity(new Intent(this, RecordTerminActivity.class));
                 break;
 
             case UNKNOWN_CUSTOMER:
