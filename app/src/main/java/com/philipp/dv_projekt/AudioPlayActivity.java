@@ -1,8 +1,6 @@
 package com.philipp.dv_projekt;
 
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,8 +17,6 @@ import java.util.concurrent.Executors;
 
 public class AudioPlayActivity extends AppCompatActivity implements WebSocketCallback {
 
-    private MediaPlayer player;
-    private static final String AUDIO_URL = "http://192.168.10.128:3000/download/sprache";
     private File localAudioFile;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -38,7 +34,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
         executor.execute(() -> {
             boolean success = false;
             try {
-                URL url = new URL(AUDIO_URL);
+                URL url = new URL(Konstanten.DOWNLOAD_SPRACHE_URL);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 
@@ -66,8 +62,9 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
             boolean finalSuccess = success;
             mainHandler.post(() -> {
                 if (finalSuccess) {
-                    // TODO hier muss evtl noch eingetragen werden, dass eine nachricht kommt, dass der roboter im wartezimmer ist
-                    playDownloadedAudio();
+                    AudioPlayerHelper.playAudioFile(this, localAudioFile.getAbsolutePath(), () ->
+                            Toast.makeText(this, "Wiedergabe beendet", Toast.LENGTH_SHORT).show()
+                    );
                 } else {
                     Toast.makeText(AudioPlayActivity.this, "Fehler beim Download der Audio-Datei", Toast.LENGTH_LONG).show();
                 }
@@ -76,62 +73,23 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
         });
     }
 
-    private void playDownloadedAudio() {
-        if (player != null) {
-            player.release();
-        }
-
-        player = new MediaPlayer();
-        player.setAudioAttributes(new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build());
-
-        player.setOnPreparedListener(MediaPlayer::start);
-        player.setOnCompletionListener(mp -> {
-            Toast.makeText(this, "Wiedergabe beendet", Toast.LENGTH_SHORT).show();
-            mp.release();
-        });
-
-        try {
-            player.setDataSource(localAudioFile.getAbsolutePath());
-            player.prepareAsync();
-        } catch (Exception e) {
-            Toast.makeText(this, "Fehler beim Starten: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
 
     @Override
     public void onMessageReceived(String jsonText) {
-
         runOnUiThread(() -> {
-
             ServerResponseHandler handler = new ServerResponseHandler();
             ResponseResult result = handler.getResponseType(jsonText);
 
-            if (player.isPlaying()) {
-
-                player.setOnCompletionListener(mp -> handleServerResponse(result));
-
+            if (AudioPlayerHelper.isPlaying()) {
+                AudioPlayerHelper.setOnCompletionListener(mp -> handleServerResponse(result));
             } else {
-
                 handleServerResponse(result);
-
             }
-
         });
-
     }
 
-    @Override
-    public void onSystemMessageReceived(String systemText) {
-        Log.d("AudioPlayActivity", "📨 Systemnachricht: " + systemText);
-    }
-
-    private void  handleServerResponse(ResponseResult result) {
-
+    private void handleServerResponse(ResponseResult result) {
         switch (result.getType()) {
-
             case FAILURE:
                 Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
                 break;
@@ -152,21 +110,23 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
     }
 
     @Override
+    public void onSystemMessageReceived(String systemText) {
+        Log.d("AudioPlayActivity", "📨 Systemnachricht: " + systemText);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (player != null) {
-            player.release();
-            player = null;
-        }
+        AudioPlayerHelper.release();
 
         if (localAudioFile != null && localAudioFile.exists()) {
             if (localAudioFile.delete()) {
                 Toast.makeText(this, "✅ Audio gelöscht!", Toast.LENGTH_SHORT).show();
-                } else {
+            } else {
                 Toast.makeText(this, "❌ Fehler beim Löschen der Audio!", Toast.LENGTH_SHORT).show();
             }
         }
 
-        executor.shutdown(); // Executor beenden
+        executor.shutdown();
     }
 }

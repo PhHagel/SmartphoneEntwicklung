@@ -1,7 +1,6 @@
 package com.philipp.dv_projekt;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -9,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class FollowRoboActivity extends AppCompatActivity implements WebSocketCallback {
 
-    private MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,20 +16,13 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
 
         WebSocketManager.getInstance().setCallback(this);
 
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-        player = MediaPlayer.create(this, R.raw.roboterfolgen);
-        player.start();
+        // Wenn der Server die richtige ROBOTER_REACHED_GOAL senden kann, dann das schreiben:
+        // AudioPlayerHelper.playAudio(this, R.raw.roboterfolgen, null, false);
 
-
-        // TODO wenn der Server die richtige Antwort zurückgibt (ROBOT_REACHED_GOAL), dann kann der Teil weg
-        player.setOnCompletionListener(mediaPlayer -> {
-            Intent intentSmartphoneBackActivity = new Intent(FollowRoboActivity.this, SmartphoneBackActivity.class);
-            startActivity(intentSmartphoneBackActivity);
+        AudioPlayerHelper.playAudio(this, R.raw.roboterfolgen, () -> {
+            startActivity(new Intent(this, SmartphoneBackActivity.class));
             finish();
-        });
+        }, false);
     }
 
     @Override
@@ -40,11 +31,9 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
         ResponseResult result = handler.getResponseType(jsonText);
 
         runOnUiThread(() -> {
-            if (player != null && player.isPlaying()) {
-                // Noch am Abspielen -> warten bis es fertig ist
-                player.setOnCompletionListener(mp -> handleMessageResponse(result));
+            if (AudioPlayerHelper.isPlaying()) {
+                AudioPlayerHelper.setOnCompletionListener(mp -> handleMessageResponse(result));
             } else {
-                // Schon fertig -> direkt ausführen
                 handleMessageResponse(result);
             }
         });
@@ -71,7 +60,6 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
                 Toast.makeText(this, "Fehler in der implementierung!!!", Toast.LENGTH_SHORT).show();
                 break;
         }
-
 
 
     }

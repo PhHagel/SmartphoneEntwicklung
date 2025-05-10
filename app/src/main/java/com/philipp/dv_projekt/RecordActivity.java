@@ -2,15 +2,16 @@ package com.philipp.dv_projekt;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.gson.Gson;
 import java.io.File;
@@ -24,7 +25,6 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
     private String filePath;
     private Button startBtn;
     private Button stopBtn;
-    private MediaPlayer player;
     private File audioFile;
 
 
@@ -43,17 +43,10 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-        player = MediaPlayer.create(RecordActivity.this, R.raw.tonaufnehmen);
-        player.start();
-
-        player.setOnCompletionListener(mp -> {
+        AudioPlayerHelper.playAudio(this, R.raw.tonaufnehmen, () -> {
             Intent timeoutIntent = new Intent(this, TimeoutService.class);
             startService(timeoutIntent);
-        });
+        }, false);
 
         startBtn.setOnClickListener(v -> {
 
@@ -99,18 +92,10 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
             startBtn.setEnabled(false);
             Toast.makeText(this, "✅ Aufnahme gespeichert unter: " + filePath, Toast.LENGTH_SHORT).show(); // nur zum Testen
 
-            // Hier wird die Audio zum Server gesendet
             audioFile = new File(filePath);
-            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", OkHttpManager.getInstance());
+            UploadHelper.uploadAudio(audioFile, Konstanten.UPLOAD_SPRACHE_URL, OkHttpManager.getInstance());
 
-            // Audio abspielen (noch nicht da)
-            // Hier wird Audio abgespielt (noch nicht da)
-            if (player != null) {
-                player.release();
-                player = null;
-            }
-            player = MediaPlayer.create(RecordActivity.this, R.raw.audiotoserver);
-            player.start();
+            AudioPlayerHelper.playAudio(this, R.raw.audiotoserver, null, false);
 
         });
 
@@ -140,14 +125,10 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
             ServerResponseHandler handler = new ServerResponseHandler();
             ResponseResult result = handler.getResponseType(jsonText);
 
-            if (player.isPlaying()) {
-
-                player.setOnCompletionListener(mp -> handleServerResponse(result, jsonText));
-
+            if (AudioPlayerHelper.isPlaying()) {
+                AudioPlayerHelper.setOnCompletionListener(mp -> handleServerResponse(result, jsonText));
             } else {
-
                 handleServerResponse(result, jsonText);
-
             }
 
         });
@@ -221,5 +202,15 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         textCheckView.setText(userDataFromServer);
 
         dialog.show();
+    }
+
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Reset an den Service schicken
+        Intent reset = new Intent("com.philipp.ACTION_RESET_TIMEOUT");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(reset);
+
+        return super.dispatchTouchEvent(ev);
     }
 }

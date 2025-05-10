@@ -14,16 +14,20 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
 import android.util.Log;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
 
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity implements SensorEventListener, WebSocketCallback {
+
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private boolean switched = false;
     private Vibrator vibrator;
     private Handler handler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class SplashActivity extends AppCompatActivity implements SensorEventList
         }
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -52,13 +57,13 @@ public class SplashActivity extends AppCompatActivity implements SensorEventList
         }
     }
 
+
     @Override
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(this);
     }
 
-    // hier muss noch ein on message ressived rein, um die Activity zu beenden wenn eine audio vom Server kommt!!!
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -81,18 +86,54 @@ public class SplashActivity extends AppCompatActivity implements SensorEventList
         }
     }
 
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Wird nicht benötigt
     }
 
+
     @Override
     public void onMessageReceived(String jsonText) {
-        // TODO hier noch prüfen was rein muss
+
+        runOnUiThread(() -> {
+
+            ServerResponseHandler handler = new ServerResponseHandler();
+            ResponseResult result = handler.getResponseType(jsonText);
+
+            switch (result.getType()) {
+
+                case AUDIO_GENERATION_REQUEST_FAILURE:
+                    Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                    break;
+
+                case AUDIO_GENERATION_REQUEST_SUCCESS:
+                    startActivity(new Intent(this, AudioPlayActivity.class));
+                    finish();
+                    break;
+
+                case FAILURE:
+                    Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                    break;
+
+                case UNKNOWN_RESPONSE:
+                    Toast.makeText(this, "Unknown Response: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                    break;
+
+                default:
+                    Toast.makeText(this, "Fehler in der implementierung!!!", Toast.LENGTH_SHORT).show();
+                    break;
+
+            }
+
+        });
+
     }
+
 
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("SplashActivity", "📨 Systemnachricht: " + systemText);
     }
+
 }

@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -35,11 +34,9 @@ import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, WebSocketCallback {
 
-
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private PreviewView previewView;
     private ImageCapture imageCapture;
-    private MediaPlayer player;
 
 
     @Override
@@ -76,17 +73,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }, getExecutor());
 
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-        player = MediaPlayer.create(MainActivity.this, R.raw.bildaufnehmen);
-        player.start();
-
-        player.setOnCompletionListener(mp -> {
+        AudioPlayerHelper.playAudio(this, R.raw.bildaufnehmen, () -> {
             Intent timeoutIntent = new Intent(this, TimeoutService.class);
             startService(timeoutIntent);
-        });
+        }, false);
+
     }
 
 
@@ -97,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @SuppressLint("RestrictedApi")
     private void startCameraX(ProcessCameraProvider cameraProvider) {
+
         cameraProvider.unbindAll();
 
         CameraSelector cameraSelector = new CameraSelector.Builder()
@@ -112,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
 
         cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+
     }
 
 
@@ -186,29 +179,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
-            //UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", OkHttpManager.getInstance());
+            //UploadHelper.uploadImage(photoFile, Konstanten.UPLOAD_BILD_URL, OkHttpManager.getInstance());
 
-            WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"4\"}");
+            // Debug Helper dies das
+            WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"0\"}");
 
-            stopService(new Intent(this, TimeoutService.class));
 
-            if (player != null) {
-
-                player.release();
-                player = null;
-
-            }
-
-            player = MediaPlayer.create(MainActivity.this, R.raw.phototoserver);
-            player.start();
-
-            stopService(new Intent(this, TimeoutService.class));
-
+            AudioPlayerHelper.playAudio(this, R.raw.phototoserver, null, false);
         });
     }
 
 
-    // on Message Handler für Json-Nachrichten vom Server
     @Override
     public void onMessageReceived(String jsonText) {
 
@@ -217,19 +198,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ResponseResult result = handler.getResponseType(jsonText);
 
 
-            if (player.isPlaying()) {
-
-                player.setOnCompletionListener(mp -> handleServerResponse(result, jsonText));
-
+            if (AudioPlayerHelper.isPlaying()) {
+                AudioPlayerHelper.setOnCompletionListener(mp -> handleServerResponse(result, jsonText));
             } else {
-
                 handleServerResponse(result, jsonText);
-
             }
 
         });
 
     }
+
 
     private void  handleServerResponse(ResponseResult result, String jsonText) {
 
@@ -256,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     startActivity(new Intent(this, RecordTerminActivity.class));
                 }
+
                 finish();
                 break;
 
@@ -287,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    // hier wird bei jedem Touch-Event der Timeout in TimeoutService.java zurückgesetzt
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         // Reset an den Service schicken
@@ -296,6 +274,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         return super.dispatchTouchEvent(ev);
     }
-
 
 }

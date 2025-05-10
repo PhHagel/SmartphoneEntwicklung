@@ -1,7 +1,6 @@
 package com.philipp.dv_projekt;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +19,6 @@ import java.util.Objects;
 
 public class RecordTerminActivity extends AppCompatActivity implements WebSocketCallback {
     private MediaRecorder recorder;
-    private MediaPlayer player;
     private String filePath;
     private Button startBtn;
     private Button stopBtn;
@@ -46,17 +44,10 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-        player = MediaPlayer.create(RecordTerminActivity.this, R.raw.terminannehmen);
-        player.start();
-
-        player.setOnCompletionListener(mp -> {
+        AudioPlayerHelper.playAudio(this, R.raw.terminannehmen, () -> {
             Intent timeoutIntent = new Intent(this, TimeoutService.class);
             startService(timeoutIntent);
-        });
+        }, false);
 
         startBtn.setOnClickListener(v -> {
 
@@ -104,14 +95,9 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
             // Hier soll die Audio zum Server gesendet werden
             audioFile = new File(filePath);
-            UploadHelper.uploadAudio(audioFile, "http://192.168.10.128:3000/upload/sprache", OkHttpManager.getInstance());
+            UploadHelper.uploadAudio(audioFile, Konstanten.UPLOAD_SPRACHE_URL, OkHttpManager.getInstance());
 
-            if (player != null) {
-                player.release();
-                player = null;
-            }
-            player = MediaPlayer.create(RecordTerminActivity.this, R.raw.audiotoserver);
-            player.start();
+            AudioPlayerHelper.playAudio(this, R.raw.audiotoserver, null, false);
 
         });
 
@@ -141,11 +127,9 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         ResponseResult result = handler.getResponseType(jsonText);
 
         runOnUiThread(() -> {
-            if (player != null && player.isPlaying()) {
-                // Noch am Abspielen -> warten bis es fertig ist
-                player.setOnCompletionListener(mp -> handleMessageResponse(result));
+            if (AudioPlayerHelper.isPlaying()) {
+                AudioPlayerHelper.setOnCompletionListener(mp -> handleMessageResponse(result));
             } else {
-                // Schon fertig -> direkt ausführen
                 handleMessageResponse(result);
             }
         });
@@ -190,12 +174,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     }
 
     private void resetAndPlay(int rawResourceId) {
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-        player = MediaPlayer.create(this, rawResourceId);
-        player.start();
+        AudioPlayerHelper.playAudio(this, rawResourceId, null, false);
     }
 
     @Override
@@ -203,10 +182,8 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         Log.d("RecordTerminActivity", "📨 Systemnachricht: " + systemText);
     }
 
-    // hier wird bei jedem Touch-Event der Timeout in TimeoutService.java zurückgesetzt
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        // Reset an den Service schicken
         Intent reset = new Intent("com.philipp.ACTION_RESET_TIMEOUT");
         LocalBroadcastManager.getInstance(this).sendBroadcast(reset);
 

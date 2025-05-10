@@ -1,38 +1,21 @@
 package com.philipp.dv_projekt;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SmartphoneBackActivity extends AppCompatActivity {
-
-    private MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smartphone_back);
 
-
-        // Audio abspielen
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-        player = MediaPlayer.create(SmartphoneBackActivity.this, R.raw.smartphonezurueklegen);
-        player.start();
-
-        // Setze OnCompletionListener, um auf das Ende des Audios zu warten
-        player.setOnCompletionListener(mp -> {
-
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                Intent intent = new Intent(SmartphoneBackActivity.this, SplashActivity.class);
-                startActivity(intent);
+        AudioPlayerHelper.playAudio(this, R.raw.smartphonezurueklegen, () -> {
+            new android.os.Handler(getMainLooper()).postDelayed(() -> {
+                startActivity(new Intent(this, SplashActivity.class));
                 finish();
-            }, 5000); // 5 Sekunden warten
-        });
+            }, 5000);
+        }, false);
     }
 }
