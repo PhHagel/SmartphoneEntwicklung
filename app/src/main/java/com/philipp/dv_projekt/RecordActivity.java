@@ -139,9 +139,6 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         runOnUiThread(() -> {
             ServerResponseHandler handler = new ServerResponseHandler();
             ResponseResult result = handler.getResponseType(jsonText);
-            Log.d("ServerResponseHandler", "✅ #########################");
-            Log.d("ServerResponseHandler", result.toString());
-            Log.d("ServerResponseHandler", "✅ #########################");
 
             if (player.isPlaying()) {
 
@@ -163,6 +160,8 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
         stopService(new Intent(this, TimeoutService.class));
 
         switch (result.getType()) {
+
+            // TODO wenn Hendrik sagt, dass das weg soll, muss das ersetzt werden mit dem anderen case xD
             case PERSON_DATA:
                 PersonResponse person = new Gson().fromJson(jsonText, PersonResponse.class);
                 String nachname = person.message.lastname;

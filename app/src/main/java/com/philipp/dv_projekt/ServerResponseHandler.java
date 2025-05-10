@@ -16,7 +16,7 @@ public class ServerResponseHandler {
 
                 switch (type) {
 
-
+                    // Für Ausruf von Patienten
                     case "AUDIO_GENERATION_REQUEST_FAILURE":
                         if (json.has("message")) {
                             String message = json.get("message").getAsString();
@@ -24,14 +24,16 @@ public class ServerResponseHandler {
                         }
                         return new ResponseResult(ResponseType.FAILURE, "Keine Message in AUDIO_GENERATION_REQUEST_FAILURE vorhanden");
 
-
+                    // Für Ausruf von Patienten
                     case "AUDIO_GENERATION_REQUEST_SUCCESS":
                         return new ResponseResult(ResponseType.AUDIO_GENERATION_REQUEST_SUCCESS, null);
 
+                    //
                     case "EXTRACT_DATA_FROM_AUDIO_SUCCESS":
                         return new ResponseResult(ResponseType.EXTRACT_DATA_FROM_AUDIO_SUCCESS, null);
 
-                    case "FAILURE":  //genereller fehler evtl für timeouts
+                    // Fehler vom Server erhalten
+                    case "FAILURE":
                         if (json.has("message")) {
                             String message = json.get("message").getAsString();
                             return new ResponseResult(ResponseType.FAILURE, message);
@@ -39,6 +41,7 @@ public class ServerResponseHandler {
                         return new ResponseResult(ResponseType.FAILURE, "Keine Message vorhanden");
 
 
+                    // Für erkannte Patienten
                     case "KNOWN_CUSTOMER":
                         if (json.has("appointment")) {
                             boolean appointment = json.get("appointment").getAsBoolean();
@@ -50,11 +53,11 @@ public class ServerResponseHandler {
                         }
                         return new ResponseResult(ResponseType.FAILURE, "appointment fehlt in KNOWN_CUSTOMER");
 
-
+                    // Nächster Termin übergeben
                     case "NEXT_APPOINTMENT":
                         return new ResponseResult(ResponseType.NEXT_APPOINTMENT, null);
 
-
+                    //
                     case "PERSON_DATA":
                         if (json.has("success")) {
                             boolean success = json.get("success").getAsBoolean();
@@ -66,22 +69,19 @@ public class ServerResponseHandler {
                         }
                         return new ResponseResult(ResponseType.FAILURE, "success fehlt in PERSON_DATA");
 
-
+                    // Wenn Roboter das Ziel erreicht hat
                     case "ROBOTER_REACHED_GOAL":
                         return new ResponseResult(ResponseType.ROBOT_REACHED_GOAL, null);
 
-
-                    case "TERMIN_INFO":
-                        return new ResponseResult(ResponseType.TERMIN_INFO, null);
-
+                    // Timeout vom Server erhalten
                     case "TIMEOUT":
                         return new ResponseResult(ResponseType.FAILURE, "Timeout vom Server erhalten");
 
-
+                    // Wenn patient nicht erkannt wurde
                     case "UNKNOWN_CUSTOMER":
                         return new ResponseResult(ResponseType.UNKNOWN_CUSTOMER, null);
 
-
+                    // Default Type
                     default:
                         return new ResponseResult(ResponseType.UNKNOWN_RESPONSE, "Type nicht vorhanden, oder noch nicht implementiert");
 

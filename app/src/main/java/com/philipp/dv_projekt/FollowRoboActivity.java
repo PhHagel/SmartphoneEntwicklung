@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.Objects;
 
 public class FollowRoboActivity extends AppCompatActivity implements WebSocketCallback {
 
@@ -27,7 +26,7 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
         player.start();
 
 
-        // das muss dann noch weg, wenn der Server die richtige antwort sendet !!!!!!!!
+        // TODO wenn der Server die richtige Antwort zurückgibt (ROBOT_REACHED_GOAL), dann kann der Teil weg
         player.setOnCompletionListener(mediaPlayer -> {
             Intent intentSmartphoneBackActivity = new Intent(FollowRoboActivity.this, SmartphoneBackActivity.class);
             startActivity(intentSmartphoneBackActivity);
@@ -53,14 +52,28 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
 
     private void handleMessageResponse(ResponseResult result) {
 
+        switch (result.getType()) {
 
-        if (Objects.requireNonNull(result.getType()) == ResponseType.ROBOT_REACHED_GOAL) {
-            Intent intentSmartphoneBackActivity = new Intent(FollowRoboActivity.this, SmartphoneBackActivity.class);
-            startActivity(intentSmartphoneBackActivity);
-            finish();
-        } else {
-            Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+            case FAILURE:
+                Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                break;
+
+            case ROBOT_REACHED_GOAL:
+                startActivity(new Intent(this, SmartphoneBackActivity.class));
+                finish();
+                break;
+
+            case UNKNOWN_RESPONSE:
+                Toast.makeText(this, "Unknown Response: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                break;
+
+            default:
+                Toast.makeText(this, "Fehler in der implementierung!!!", Toast.LENGTH_SHORT).show();
+                break;
         }
+
+
+
     }
 
     @Override

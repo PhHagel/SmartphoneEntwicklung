@@ -155,6 +155,8 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         stopService(new Intent(this, TimeoutService.class));
 
         switch (result.getType()) {
+
+            // TODO prüfen
             case NEXT_APPOINTMENT:
                 DateTimeResponse dateTimeResponse = new Gson().fromJson(result.getMessage(), DateTimeResponse.class);
 
@@ -167,7 +169,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 datumTextView.setText(text);
                 break;
 
-            case TERMIN_INFO:
+            case EXTRACT_DATA_FROM_AUDIO_SUCCESS:
                 TerminResponse terminResponse = new Gson().fromJson(result.getMessage(), TerminResponse.class);
                 String antwort = terminResponse.message;
                 if ("Nein".equals(antwort)) {

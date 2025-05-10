@@ -88,7 +88,7 @@ public class SplashActivity extends AppCompatActivity implements SensorEventList
 
     @Override
     public void onMessageReceived(String jsonText) {
-        // Hier muss nach ausrufen gecheckt werden
+        // TODO hier noch prüfen was rein muss
     }
 
     @Override

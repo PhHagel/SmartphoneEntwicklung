@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //UploadHelper.uploadImage(photoFile, "http://192.168.10.128:3000/upload/gesicht", OkHttpManager.getInstance());
 
-            WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"1\"}");
+            WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"4\"}");
 
             stopService(new Intent(this, TimeoutService.class));
 
@@ -235,29 +235,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (result.getType()) {
 
+            case AUDIO_GENERATION_REQUEST_FAILURE:
+                Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                break;
+
+            case AUDIO_GENERATION_REQUEST_SUCCESS:
+                startActivity(new Intent(this, AudioPlayActivity.class));
+                finish();
+                break;
+
+            case FAILURE:
+                Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                break;
+
             case KNOWN_CUSTOMER:
                 JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
-                String appointment = json.has("Appointment") ? json.get("Appointment").getAsString() : "FALSE";
+                String appointment = json.has("appointment") ? json.get("appointment").getAsString() : "FALSE";
                 if (appointment.equalsIgnoreCase("TRUE")) {
                     startActivity(new Intent(this, FollowRoboActivity.class));
                 } else {
                     startActivity(new Intent(this, RecordTerminActivity.class));
                 }
+                finish();
                 break;
 
             case KNOWN_CUSTOMER_WITHOUT_APPOINTMENT:
                 startActivity(new Intent(this, RecordTerminActivity.class));
+                finish();
                 break;
 
             case UNKNOWN_CUSTOMER:
                 startActivity(new Intent(this, RecordActivity.class));
+                finish();
+                break;
+
+            case UNKNOWN_RESPONSE:
+                Toast.makeText(this, "Unknown Response: " + result.getMessage(), Toast.LENGTH_SHORT).show();
                 break;
 
             default:
-                Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Fehler in der implementierung!!!", Toast.LENGTH_SHORT).show();
+                break;
         }
-
-        finish();
     }
 
 
