@@ -18,7 +18,7 @@ public class WebSocketClient {
         OkHttpClient client = OkHttpManager.getInstance();
 
         Request request = new Request.Builder()
-                .url("ws://192.168.10.128:3001")  // ← IP des Servers samt Port
+                .url(Konstanten.WS_URL)  // ← IP des Servers samt Port
                 .build();
 
         webSocket = client.newWebSocket(request, new WebSocketListener() {
