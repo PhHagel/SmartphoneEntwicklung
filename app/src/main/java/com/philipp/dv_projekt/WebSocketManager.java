@@ -6,7 +6,6 @@ public class WebSocketManager {
 
     private static WebSocketManager instance;
     private final WebSocketClient webSocketClient;
-
     private static final String TAG = "WebSocketManager";
 
     private WebSocketManager() {

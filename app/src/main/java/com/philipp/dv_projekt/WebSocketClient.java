@@ -9,6 +9,7 @@ public class WebSocketClient {
     private WebSocket webSocket;
     private WebSocketCallback callback;
 
+
     public void setCallback(WebSocketCallback callback) {
         this.callback = callback;
     }
