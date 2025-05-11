@@ -35,8 +35,8 @@ import java.util.concurrent.Executor;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, WebSocketCallback {
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    private PreviewView previewView;
     private ImageCapture imageCapture;
+    private PreviewView previewView;
 
 
     @Override
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case UNKNOWN_CUSTOMER:
-                startActivity(new Intent(this, RecordActivity.class));
+                startActivity(new Intent(this, RecordPersonActivity.class));
                 finish();
                 break;
 

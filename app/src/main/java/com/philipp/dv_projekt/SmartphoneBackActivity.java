@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SmartphoneBackActivity extends AppCompatActivity {
 
+    private static final int DELAY_MILLIS = 5000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -13,9 +15,9 @@ public class SmartphoneBackActivity extends AppCompatActivity {
 
         AudioPlayerHelper.playAudio(this, R.raw.smartphonezurueklegen, () -> {
             new android.os.Handler(getMainLooper()).postDelayed(() -> {
-                startActivity(new Intent(this, SplashActivity.class));
+                startActivity(new Intent(this, StandbyActivity.class));
                 finish();
-            }, 5000);
+            }, DELAY_MILLIS);
         }, false);
     }
 }

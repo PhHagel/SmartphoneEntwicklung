@@ -25,8 +25,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DVProjekt">
 
-        <activity android:name=".SplashActivity" />
-        <activity android:name=".RecordActivity" />
+        <activity android:name=".StandbyActivity" />
+        <activity android:name=".RecordPersonActivity" />
         <activity android:name=".RecordTerminActivity" />
         <activity android:name=".FollowRoboActivity" />
         <activity android:name=".SmartphoneBackActivity" />

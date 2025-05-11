@@ -19,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 @SuppressLint("CustomSplashScreen")
-public class SplashActivity extends AppCompatActivity implements SensorEventListener, WebSocketCallback {
+public class StandbyActivity extends AppCompatActivity implements SensorEventListener, WebSocketCallback {
 
 
     private SensorManager sensorManager;
@@ -80,7 +80,7 @@ public class SplashActivity extends AppCompatActivity implements SensorEventList
             }
 
             handler.postDelayed(() -> {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                startActivity(new Intent(StandbyActivity.this, MainActivity.class));
                 finish();
             }, 300);
         }

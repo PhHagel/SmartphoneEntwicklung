@@ -1,10 +1,8 @@
 package com.philipp.dv_projekt;
 
 import androidx.annotation.NonNull;
-
 import java.io.File;
 import java.io.IOException;
-
 import okhttp3.*;
 
 public class UploadHelper {

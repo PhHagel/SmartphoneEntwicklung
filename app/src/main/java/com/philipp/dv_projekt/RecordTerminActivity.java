@@ -20,8 +20,9 @@ import java.util.Objects;
 public class RecordTerminActivity extends AppCompatActivity implements WebSocketCallback {
     private MediaRecorder recorder;
     private String filePath;
-    private Button startBtn;
-    private Button stopBtn;
+    private final Button startBtn = findViewById(R.id.btn_start_recording);
+    private final Button stopBtn = findViewById(R.id.btn_stop_recording);
+    private final Button closeBtn = findViewById(R.id.btn_closePage);
     private File audioFile;
 
     @Override
@@ -33,10 +34,6 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         String text = String.format("Datum: %s%nTag: %s%nZeit: %s",
                 "15.06.2000", "Fr", "15:00");
         datumTextView.setText(text);
-
-        startBtn = findViewById(R.id.btn_start_recording);
-        stopBtn = findViewById(R.id.btn_stop_recording);
-        Button closeBtn = findViewById(R.id.btn_closePage);
 
         stopBtn.setEnabled(false);
 
@@ -144,9 +141,9 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
             case NEXT_APPOINTMENT:
                 DateTimeResponse dateTimeResponse = new Gson().fromJson(result.getMessage(), DateTimeResponse.class);
 
-                String datum = dateTimeResponse.Date;
-                String tag = dateTimeResponse.Weekday;
-                String zeit = dateTimeResponse.Time;
+                String datum = dateTimeResponse.date;
+                String tag = dateTimeResponse.weekday;
+                String zeit = dateTimeResponse.time;
 
                 TextView datumTextView = findViewById(R.id.DatenTextTermin);
                 String text = String.format("Datum: %s%nTag: %s%nZeit: %s", datum, tag, zeit);

@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 public class AudioPlayActivity extends AppCompatActivity implements WebSocketCallback {
 
     private File localAudioFile;
-
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 

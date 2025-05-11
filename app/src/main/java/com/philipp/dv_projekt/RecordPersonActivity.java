@@ -18,24 +18,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-public class RecordActivity extends AppCompatActivity implements WebSocketCallback {
+public class RecordPersonActivity extends AppCompatActivity implements WebSocketCallback {
 
 
-    private MediaRecorder recorder;
-    private String filePath;
-    private Button startBtn;
-    private Button stopBtn;
     private File audioFile;
+    private final Button closeBtn = findViewById(R.id.btn_closePage);
+    private String filePath;
+    private MediaRecorder recorder;
+    private final Button startBtn = findViewById(R.id.btn_start_recording);
+    private final Button stopBtn = findViewById(R.id.btn_stop_recording);
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
-
-        startBtn = findViewById(R.id.btn_start_recording);
-        stopBtn = findViewById(R.id.btn_stop_recording);
-        Button closeBtn = findViewById(R.id.btn_closePage);
 
         stopBtn.setEnabled(false);
 
@@ -111,7 +108,7 @@ public class RecordActivity extends AppCompatActivity implements WebSocketCallba
                 }
             }
 
-            Intent intent = new Intent(RecordActivity.this, MainActivity.class);
+            Intent intent = new Intent(RecordPersonActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         });

@@ -35,7 +35,7 @@ public class TimeoutService extends Service {
 
         // Runnable, das bei Timeout die SplashActivity startet
         timeoutRunnable = () -> {
-            Intent splash = new Intent(TimeoutService.this, SplashActivity.class);
+            Intent splash = new Intent(TimeoutService.this, StandbyActivity.class);
             splash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(splash);
             stopSelf();  // Service beenden, falls gewünscht
