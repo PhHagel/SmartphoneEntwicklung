@@ -20,15 +20,18 @@ import java.util.Objects;
 public class RecordTerminActivity extends AppCompatActivity implements WebSocketCallback {
     private MediaRecorder recorder;
     private String filePath;
-    private final Button startBtn = findViewById(R.id.btn_start_recording);
-    private final Button stopBtn = findViewById(R.id.btn_stop_recording);
-    private final Button closeBtn = findViewById(R.id.btn_closePage);
+    private Button startBtn;
+    private Button stopBtn;
     private File audioFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_termin);
+
+        startBtn = findViewById(R.id.btn_start_recording);
+        stopBtn = findViewById(R.id.btn_stop_recording);
+        Button closeBtn = findViewById(R.id.btn_closePage);
 
         TextView datumTextView = findViewById(R.id.DatenTextTermin);
         String text = String.format("Datum: %s%nTag: %s%nZeit: %s",

@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //UploadHelper.uploadImage(photoFile, Konstanten.UPLOAD_BILD_URL, OkHttpManager.getInstance());
 
             // Debug Helper dies das
-            WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"0\"}");
+            WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"1\"}");
 
 
             AudioPlayerHelper.playAudio(this, R.raw.phototoserver, null, false);

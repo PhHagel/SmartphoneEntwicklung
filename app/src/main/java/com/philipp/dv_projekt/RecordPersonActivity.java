@@ -22,17 +22,20 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
 
     private File audioFile;
-    private final Button closeBtn = findViewById(R.id.btn_closePage);
     private String filePath;
     private MediaRecorder recorder;
-    private final Button startBtn = findViewById(R.id.btn_start_recording);
-    private final Button stopBtn = findViewById(R.id.btn_stop_recording);
+    private Button startBtn;
+    private Button stopBtn;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
+
+        Button closeBtn = findViewById(R.id.btn_closePage);
+        startBtn = findViewById(R.id.btn_start_recording);
+        stopBtn = findViewById(R.id.btn_stop_recording);
 
         stopBtn.setEnabled(false);
 
