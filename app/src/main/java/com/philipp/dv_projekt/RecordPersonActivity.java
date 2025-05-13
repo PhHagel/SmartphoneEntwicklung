@@ -140,9 +140,11 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
         stopService(new Intent(this, TimeoutService.class));
 
+        Log.d("RecordPersonActivity", "📨 onMessageReceived Message: " + result.getMessage());
+        Log.d("RecordPersonActivity", "📨 onMessageReceived Type: " + result.getType());
+
         switch (result.getType()) {
 
-            // TODO wenn Hendrik sagt, dass das weg soll, muss das ersetzt werden mit dem anderen case xD
             case PERSON_DATA:
                 PersonResponse person = new Gson().fromJson(jsonText, PersonResponse.class);
                 String nachname = person.message.lastname;
@@ -160,8 +162,8 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
                 break;
 
             default:
-                Log.d("RecordActivity", "❓ Unbekannter Type vom Server: " + result.getType());
-                Log.d("RecordActivity", "❓ Unbekannte Antwort vom Server: " + jsonText);
+                Log.d("RecordPersonActivity", "❓ Unbekannter Type vom Server: " + result.getType());
+                Log.d("RecordPersonActivity", "❓ Unbekannte Antwort vom Server: " + jsonText);
                 Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
         }
 
