@@ -1,6 +1,5 @@
 package com.philipp.dv_projekt;
 
-import android.util.Log;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -92,7 +91,7 @@ public class ServerResponseHandler {
             }
 
         } catch (Exception e) {
-            Log.e("ServerResponseHandler", "Exception beim Parsen des JSON!", e);
+            System.err.println("Exception beim JSON-Parsing: " + e.getMessage());
             return new ResponseResult(ResponseType.UNKNOWN_RESPONSE, "Exception beim JSON-Parsing: " + e.getMessage());
         }
     }

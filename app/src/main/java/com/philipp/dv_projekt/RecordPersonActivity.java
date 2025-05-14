@@ -150,9 +150,9 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
                 String nachname = person.message.lastname;
                 String vorname = person.message.firstname;
                 String geschlecht = person.message.sex;
-                String geburtsdatum = person.message.dateOfBirth;
-                String telefon = person.message.phoneNumber;
-                String email = person.message.emailAddress; //schauen wegen @
+                String geburtsdatum = person.message.date_of_birth;
+                String telefon = person.message.phone_number;
+                String email = person.message.email_address;
                 showNewUserData("Nachname: " + nachname + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
                         "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telefon + "\nE-Mail: " + email);
                 break;

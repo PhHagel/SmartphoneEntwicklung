@@ -4,11 +4,11 @@ public class PersonResponse {
     public Person message;
 
     public static class Person {
-        public String dateOfBirth;
-        public String emailAddress;
         public String firstname;
         public String lastname;
-        public String phoneNumber;
         public String sex;
+        public String date_of_birth;
+        public String phone_number;
+        public String email_address;
     }
 }
