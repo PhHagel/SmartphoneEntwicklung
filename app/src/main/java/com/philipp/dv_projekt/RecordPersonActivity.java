@@ -153,12 +153,18 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
                 String geburtsdatum = person.message.date_of_birth;
                 String telefon = person.message.phone_number;
                 String email = person.message.email_address;
+                Log.d("RecordPersonActivity", "📨 Personendaten: " + jsonText);
                 showNewUserData("Nachname: " + nachname + "\nVorname: " + vorname + "\nGeschlecht: " + geschlecht +
                         "\nGeburtsdatum: " + geburtsdatum + "\nTelefonnummer: " + telefon + "\nE-Mail: " + email);
                 break;
 
             case PERSON_DATA_SUCCESS_FALSE:
                 Toast .makeText(this, "❌ Personendaten nicht erfolgreich neu versuchen", Toast.LENGTH_SHORT).show();
+                break;
+
+            case FAILURE:
+                Log.d("RecordPersonActivity", "❌ Fehler vom Server: " + result.getMessage());
+                Toast.makeText(this, "❌ Fehler vom Server: " + result.getMessage(), Toast.LENGTH_SHORT).show();
                 break;
 
             default:

@@ -33,11 +33,6 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         stopBtn = findViewById(R.id.btn_stop_recording);
         Button closeBtn = findViewById(R.id.btn_closePage);
 
-        TextView datumTextView = findViewById(R.id.DatenTextTermin);
-        String text = String.format("Datum: %s%nTag: %s%nZeit: %s",
-                "15.06.2000", "Fr", "15:00");
-        datumTextView.setText(text);
-
         stopBtn.setEnabled(false);
 
         WebSocketManager.getInstance().setCallback(this);
@@ -142,24 +137,27 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
             // TODO prüfen
             case NEXT_APPOINTMENT:
-                DateTimeResponse dateTimeResponse = new Gson().fromJson(result.getMessage(), DateTimeResponse.class);
+                NextAppointmentResponse nextAppointmentResponse = new Gson().fromJson(result.getMessage(), NextAppointmentResponse.class);
+
+                DateTimeResponse dateTimeResponse = nextAppointmentResponse.message;
 
                 String datum = dateTimeResponse.date;
                 String tag = dateTimeResponse.weekday;
                 String zeit = dateTimeResponse.time;
 
                 TextView datumTextView = findViewById(R.id.DatenTextTermin);
-                String text = String.format("Datum: %s%nTag: %s%nZeit: %s", datum, tag, zeit);
+                String text = String.format("Datum: "+ datum + "\nTag: " + tag + "\nZeit: " + zeit);
+                Log.d("RecordTerminActivity", "📅 Nächster Termin: " + text);
                 datumTextView.setText(text);
                 break;
 
             case EXTRACT_DATA_FROM_AUDIO_SUCCESS:
                 TerminResponse terminResponse = new Gson().fromJson(result.getMessage(), TerminResponse.class);
                 String antwort = terminResponse.message;
-                if ("Nein".equals(antwort)) {
+                if ("NO".equals(antwort)) {
                     Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.abgelehntertermin);
-                } else if ("Ja".equals(antwort)) {
+                } else if ("YES".equals(antwort)) {
                     Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.angenommenertermin);
                 } else {

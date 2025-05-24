@@ -54,7 +54,7 @@ public class ServerResponseHandler {
 
                     // Nächster Termin übergeben
                     case "NEXT_APPOINTMENT":
-                        return new ResponseResult(ResponseType.NEXT_APPOINTMENT, null);
+                        return new ResponseResult(ResponseType.NEXT_APPOINTMENT, jsonString);
 
                     //
                     case "PERSON_DATA":
