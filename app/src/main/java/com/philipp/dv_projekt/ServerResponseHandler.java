@@ -29,7 +29,11 @@ public class ServerResponseHandler {
 
                     //
                     case "EXTRACT_DATA_FROM_AUDIO_SUCCESS":
-                        return new ResponseResult(ResponseType.EXTRACT_DATA_FROM_AUDIO_SUCCESS, null);
+                        if (json.has("message")) {
+                            String message = json.get("message").getAsString();
+                            return new ResponseResult(ResponseType.EXTRACT_DATA_FROM_AUDIO_SUCCESS, message);
+                        }
+                        return new ResponseResult(ResponseType.FAILURE, "Keine Message vorhanden");
 
                     // Fehler vom Server erhalten
                     case "FAILURE":
@@ -59,8 +63,8 @@ public class ServerResponseHandler {
                     //
                     case "PERSON_DATA":
                         if (json.has("success")) {
-                            boolean success = json.get("success").getAsBoolean();
-                            if (success) {
+                            String successStr = json.get("success").getAsString();
+                            if ("success".equalsIgnoreCase(successStr)) {
                                 return new ResponseResult(ResponseType.PERSON_DATA, null);
                             } else {
                                 return new ResponseResult(ResponseType.PERSON_DATA_SUCCESS_FALSE, null);

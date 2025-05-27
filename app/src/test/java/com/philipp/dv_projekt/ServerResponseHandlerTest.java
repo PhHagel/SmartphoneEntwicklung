@@ -38,7 +38,7 @@ public class ServerResponseHandlerTest {
 
     @Test
     public void testExtractDataFromAudioSuccess() {
-        String json = "{\"type\":\"EXTRACT_DATA_FROM_AUDIO_SUCCESS\"}";
+        String json = "{\"type\":\"EXTRACT_DATA_FROM_AUDIO_SUCCESS\", \"message\":\"NO\"}";
         ResponseResult result = handler.getResponseType(json);
         assertEquals(ResponseType.EXTRACT_DATA_FROM_AUDIO_SUCCESS, result.getType());
     }
@@ -90,7 +90,7 @@ public class ServerResponseHandlerTest {
 
     @Test
     public void testPersonDataSuccess() {
-        String json = "{\"type\":\"PERSON_DATA\", \"success\":true}";
+        String json = "{\"type\":\"PERSON_DATA\", \"success\":success}";
         ResponseResult result = handler.getResponseType(json);
         assertEquals(ResponseType.PERSON_DATA, result.getType());
     }

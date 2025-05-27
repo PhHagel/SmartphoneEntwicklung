@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -190,10 +192,17 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
         Button userDeleteBtn = dialog.findViewById(R.id.userDeleteBtn);
         Button userAcceptBtn = dialog.findViewById(R.id.userAcceptBtn);
 
+        JsonObject message = new JsonObject();
+        message.addProperty("type", "DATA_CONFIRMATION");
+
         userDeleteBtn.setOnClickListener(v -> {
             if (audioFile.delete()) {
-                WebSocketManager.getInstance().sendMessage("user_declined");
+
+                message.addProperty("Answer", "FALSE");
+                WebSocketManager.getInstance().sendMessage(message.toString());
+
                 Toast.makeText(this, "✅ Person gelöscht. Bitte neu versuchen", Toast.LENGTH_SHORT).show();
+                startBtn.setEnabled(true);
                 dialog.dismiss();
             } else {
                 Toast.makeText(this, "❌ Fehler beim Löschen der Person!", Toast.LENGTH_SHORT).show();
@@ -201,7 +210,10 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
         });
 
         userAcceptBtn.setOnClickListener(v -> {
-            WebSocketManager.getInstance().sendMessage("user_accepted");
+
+            message.addProperty("Answer", "TRUE");
+            WebSocketManager.getInstance().sendMessage(message.toString());
+
             Toast.makeText(this, "✅ Person akzeptiert!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, RecordTerminActivity.class));
             dialog.dismiss();

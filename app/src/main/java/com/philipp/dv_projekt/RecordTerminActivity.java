@@ -41,7 +41,11 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         AudioPlayerHelper.playAudio(this, R.raw.terminannehmen, () -> {
             Intent timeoutIntent = new Intent(this, TimeoutService.class);
-            startService(timeoutIntent);
+            if(AudioPlayerHelper.isPlaying()) {
+                AudioPlayerHelper.setOnCompletionListener(mp -> this.startService(timeoutIntent));
+            } else {
+                this.startService(timeoutIntent);
+            }
         }, false);
 
         startBtn.setOnClickListener(v -> {
@@ -133,6 +137,8 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     private void handleMessageResponse(ResponseResult result) {
         stopService(new Intent(this, TimeoutService.class));
 
+        TextView datumTextView = findViewById(R.id.DatenTextTermin);
+
         switch (result.getType()) {
 
             // TODO prüfen
@@ -145,21 +151,34 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 String tag = dateTimeResponse.weekday;
                 String zeit = dateTimeResponse.time;
 
-                TextView datumTextView = findViewById(R.id.DatenTextTermin);
+
                 String text = String.format("Datum: "+ datum + "\nTag: " + tag + "\nZeit: " + zeit);
                 Log.d("RecordTerminActivity", "📅 Nächster Termin: " + text);
                 datumTextView.setText(text);
                 break;
 
             case EXTRACT_DATA_FROM_AUDIO_SUCCESS:
-                TerminResponse terminResponse = new Gson().fromJson(result.getMessage(), TerminResponse.class);
-                String antwort = terminResponse.message;
+                String antwort = result.getMessage();
+                Log.d("RecordTerminActivity", "📨 Antwort JA/NEIN: " + antwort);
                 if ("NO".equals(antwort)) {
                     Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.abgelehntertermin);
+                    datumTextView.setText("");
+                    startBtn.setEnabled(true);
                 } else if ("YES".equals(antwort)) {
                     Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.angenommenertermin);
+                    if (AudioPlayerHelper.isPlaying()) {
+                        AudioPlayerHelper.setOnCompletionListener(mp -> {
+                            Intent intent = new Intent(RecordTerminActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        });
+                    } else {
+                        Intent intent = new Intent(RecordTerminActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
                 } else {
                     Toast.makeText(this, "❓ Unbekannte Antwort vom Server", Toast.LENGTH_SHORT).show();
                 }

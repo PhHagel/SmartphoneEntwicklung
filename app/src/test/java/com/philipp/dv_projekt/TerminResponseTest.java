@@ -8,10 +8,10 @@ public class TerminResponseTest {
 
     @Test
     public void testDeserialization() {
-        String json = "{\"message\":\"Ja\"}";
+        String json = "{\"message\":\"YES\"}";
         Gson gson = new Gson();
         TerminResponse response = gson.fromJson(json, TerminResponse.class);
 
-        assertEquals("Ja", response.message);
+        assertEquals("YES", response.message);
     }
 }
