@@ -27,7 +27,7 @@ public class ServerResponseHandler {
                     case "AUDIO_GENERATION_REQUEST_SUCCESS":
                         return new ResponseResult(ResponseType.AUDIO_GENERATION_REQUEST_SUCCESS, null);
 
-                    //
+                    // Wenn der Command aus der Audio zurück kommt
                     case "EXTRACT_DATA_FROM_AUDIO_SUCCESS":
                         if (json.has("message")) {
                             String message = json.get("message").getAsString();
@@ -60,7 +60,7 @@ public class ServerResponseHandler {
                     case "NEXT_APPOINTMENT":
                         return new ResponseResult(ResponseType.NEXT_APPOINTMENT, jsonString);
 
-                    //
+                    // Wenn Personendaten übergeben werden sollen
                     case "PERSON_DATA":
                         if (json.has("success")) {
                             String successStr = json.get("success").getAsString();
@@ -71,6 +71,14 @@ public class ServerResponseHandler {
                             }
                         }
                         return new ResponseResult(ResponseType.FAILURE, "success fehlt in PERSON_DATA");
+
+                    // Wenn das Handy zurück auf den Roboter gelegt wurde
+                    case "PHONE_IS_BACK":
+                        return new ResponseResult(ResponseType.PHONE_IS_BACK, null);
+
+                    // Wenn Audio "dass der Patient das Handy auf den Roboter legen soll" erneut abgespielt werden soll
+                    case "REPEAT_AUDIO":
+                        return new ResponseResult(ResponseType.REPEAT_AUDIO_PHONE_DOWN, null);
 
                     // Wenn Roboter das Ziel erreicht hat
                     case "ROBOTER_REACHED_GOAL":
