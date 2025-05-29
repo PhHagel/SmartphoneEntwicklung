@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
     private PreviewView previewView;
+    private Intent timeoutIntent;
 
 
     @Override
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Button bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
+        timeoutIntent = new Intent(this, TimeoutService.class);
+
 
         WebSocketManager.getInstance().setCallback(this);
         WebSocketManager.getInstance().connect();
@@ -73,10 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }, getExecutor());
 
-        AudioPlayerHelper.playAudio(this, R.raw.bildaufnehmen, () -> {
-            Intent timeoutIntent = new Intent(this, TimeoutService.class);
-            startService(timeoutIntent);
-        }, false);
+        AudioPlayerHelper.playAudio(this, R.raw.bildaufnehmen, () -> startService(timeoutIntent), false);
 
     }
 
@@ -184,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Debug Helper dies das
             //WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"1\"}");
 
+            this.stopService(timeoutIntent);
 
             AudioPlayerHelper.playAudio(this, R.raw.phototoserver, null, false);
         });

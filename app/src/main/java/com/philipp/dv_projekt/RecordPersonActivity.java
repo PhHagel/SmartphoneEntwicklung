@@ -28,6 +28,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
     private MediaRecorder recorder;
     private Button startBtn;
     private Button stopBtn;
+    private Intent timeoutIntent;
 
 
     @Override
@@ -38,6 +39,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
         Button closeBtn = findViewById(R.id.btn_closePage);
         startBtn = findViewById(R.id.btn_start_recording);
         stopBtn = findViewById(R.id.btn_stop_recording);
+        timeoutIntent = new Intent(this, TimeoutService.class);
 
         stopBtn.setEnabled(false);
 
@@ -45,14 +47,11 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
-        AudioPlayerHelper.playAudio(this, R.raw.tonaufnehmen, () -> {
-            Intent timeoutIntent = new Intent(this, TimeoutService.class);
-            startService(timeoutIntent);
-        }, false);
+        AudioPlayerHelper.playAudio(this, R.raw.tonaufnehmen, () -> startService(timeoutIntent), false);
 
         startBtn.setOnClickListener(v -> {
 
-            stopService(new Intent(this, TimeoutService.class));
+            this.stopService(timeoutIntent);
 
             String audioFileName = "person-" + System.currentTimeMillis();
             filePath = Objects.requireNonNull(getExternalFilesDir(null)).getAbsolutePath() + "/" + audioFileName + ".m4a";
@@ -80,6 +79,9 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
         });
 
         stopBtn.setOnClickListener(v -> {
+
+            this.stopService(timeoutIntent);
+
             try {
                 recorder.stop();
                 aufnahmeAnimation.cancelAnimation();
@@ -139,8 +141,6 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
 
     private void  handleServerResponse(ResponseResult result, String jsonText) {
-
-        stopService(new Intent(this, TimeoutService.class));
 
         Log.d("RecordPersonActivity", "📨 onMessageReceived Message: " + result.getMessage());
         Log.d("RecordPersonActivity", "📨 onMessageReceived Type: " + result.getType());

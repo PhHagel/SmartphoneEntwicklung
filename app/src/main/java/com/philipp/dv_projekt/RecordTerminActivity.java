@@ -23,12 +23,14 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     private Button startBtn;
     private Button stopBtn;
     private File audioFile;
+    private Intent timeoutIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_termin);
 
+        timeoutIntent = new Intent(this, TimeoutService.class);
         startBtn = findViewById(R.id.btn_start_recording);
         stopBtn = findViewById(R.id.btn_stop_recording);
         Button closeBtn = findViewById(R.id.btn_closePage);
@@ -39,18 +41,12 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
-        AudioPlayerHelper.playAudio(this, R.raw.terminannehmen, () -> {
-            Intent timeoutIntent = new Intent(this, TimeoutService.class);
-            if(AudioPlayerHelper.isPlaying()) {
-                AudioPlayerHelper.setOnCompletionListener(mp -> this.startService(timeoutIntent));
-            } else {
-                this.startService(timeoutIntent);
-            }
-        }, false);
+        AudioPlayerHelper.playAudio(this, R.raw.terminannehmen, null, false);
+
 
         startBtn.setOnClickListener(v -> {
 
-            stopService(new Intent(this, TimeoutService.class));
+            this.stopService(timeoutIntent);
 
             String audioFileName = "command-" + System.currentTimeMillis();
             filePath = Objects.requireNonNull(getExternalFilesDir(null)).getAbsolutePath() + "/" + audioFileName + ".m4a";
@@ -112,8 +108,6 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 }
             }
 
-            stopService(new Intent(this, TimeoutService.class));
-
             Intent intent = new Intent(RecordTerminActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -135,7 +129,6 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     }
 
     private void handleMessageResponse(ResponseResult result) {
-        stopService(new Intent(this, TimeoutService.class));
 
         TextView datumTextView = findViewById(R.id.DatenTextTermin);
 
@@ -155,6 +148,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 String text = String.format("Datum: "+ datum + "\nTag: " + tag + "\nZeit: " + zeit);
                 Log.d("RecordTerminActivity", "📅 Nächster Termin: " + text);
                 datumTextView.setText(text);
+                this.startService(timeoutIntent);
                 break;
 
             case EXTRACT_DATA_FROM_AUDIO_SUCCESS:
