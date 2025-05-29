@@ -1,7 +1,6 @@
 package com.philipp.dv_projekt;
 
 import android.content.Context;
-import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.widget.Toast;
@@ -10,7 +9,7 @@ public class AudioPlayerHelper {
 
     private static MediaPlayer player;
 
-    public static void playAudio(Context context, int audioResId, Runnable onCompletion, boolean startTimeoutService) {
+    public static void playAudio(Context context, int audioResId, Runnable onCompletion) {
         release();
 
         player = MediaPlayer.create(context, audioResId);
@@ -18,10 +17,6 @@ public class AudioPlayerHelper {
 
         player.setOnCompletionListener(mp -> {
             if (onCompletion != null) onCompletion.run();
-            if (startTimeoutService) {
-                Intent timeoutIntent = new Intent(context, TimeoutService.class);
-                context.startService(timeoutIntent);
-            }
             release();
         });
 

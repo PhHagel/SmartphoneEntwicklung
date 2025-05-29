@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }, getExecutor());
 
-        AudioPlayerHelper.playAudio(this, R.raw.bildaufnehmen, () -> startService(timeoutIntent), false);
+        AudioPlayerHelper.playAudio(this, R.raw.bildaufnehmen, () -> startService(timeoutIntent));
 
     }
 
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             this.stopService(timeoutIntent);
 
-            AudioPlayerHelper.playAudio(this, R.raw.phototoserver, null, false);
+            AudioPlayerHelper.playAudio(this, R.raw.phototoserver, null);
         });
     }
 

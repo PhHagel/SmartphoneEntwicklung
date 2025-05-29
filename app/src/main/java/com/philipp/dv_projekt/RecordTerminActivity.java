@@ -41,7 +41,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
 
-        AudioPlayerHelper.playAudio(this, R.raw.terminannehmen, null, false);
+        AudioPlayerHelper.playAudio(this, R.raw.terminannehmen, null);
 
 
         startBtn.setOnClickListener(v -> {
@@ -92,7 +92,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
             audioFile = new File(filePath);
             UploadHelper.uploadAudio(audioFile, Konstanten.UPLOAD_SPRACHE_URL, OkHttpManager.getInstance());
 
-            AudioPlayerHelper.playAudio(this, R.raw.audiotoserver, null, false);
+            AudioPlayerHelper.playAudio(this, R.raw.audiotoserver, null);
 
         });
 
@@ -185,7 +185,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     }
 
     private void resetAndPlay(int rawResourceId) {
-        AudioPlayerHelper.playAudio(this, rawResourceId, null, false);
+        AudioPlayerHelper.playAudio(this, rawResourceId, null);
     }
 
     @Override

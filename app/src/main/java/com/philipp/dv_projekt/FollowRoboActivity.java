@@ -17,7 +17,7 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
         WebSocketManager.getInstance().setCallback(this);
 
         // Wenn der Server die richtige ROBOTER_REACHED_GOAL senden kann, dann das schreiben:
-        AudioPlayerHelper.playAudio(this, R.raw.roboterfolgen, null, false);
+        AudioPlayerHelper.playAudio(this, R.raw.roboterfolgen, null);
 
 //        AudioPlayerHelper.playAudio(this, R.raw.roboterfolgen, () -> {
 //            startActivity(new Intent(this, SmartphoneBackActivity.class));

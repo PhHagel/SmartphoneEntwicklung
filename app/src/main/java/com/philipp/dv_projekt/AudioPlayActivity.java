@@ -89,6 +89,9 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
 
     private void handleServerResponse(ResponseResult result) {
         switch (result.getType()) {
+
+            // hier könnte noch rein, wenn die Audio erneut abgespielt werden soll
+
             case FAILURE:
                 Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
                 break;

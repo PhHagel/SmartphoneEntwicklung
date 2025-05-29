@@ -14,7 +14,7 @@ public class SmartphoneBackActivity extends AppCompatActivity implements WebSock
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smartphone_back);
 
-        AudioPlayerHelper.playAudio(this, R.raw.smartphonezurueklegen, null, false);
+        AudioPlayerHelper.playAudio(this, R.raw.smartphonezurueklegen, null);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class SmartphoneBackActivity extends AppCompatActivity implements WebSock
                 break;
 
             case REPEAT_AUDIO_PHONE_DOWN:
-                AudioPlayerHelper.playAudio(this, R.raw.smartphonezurueklegen, null, false);
+                AudioPlayerHelper.playAudio(this, R.raw.smartphonezurueklegen, null);
                 break;
 
             case FAILURE:
