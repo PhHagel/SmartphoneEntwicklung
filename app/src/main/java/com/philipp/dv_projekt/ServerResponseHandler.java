@@ -76,12 +76,8 @@ public class ServerResponseHandler {
                     case "PHONE_IS_BACK":
                         return new ResponseResult(ResponseType.PHONE_IS_BACK, null);
 
-                    // Wenn Audio "dass der Patient das Handy auf den Roboter legen soll" erneut abgespielt werden soll
-                    case "REPEAT_AUDIO":
-                        return new ResponseResult(ResponseType.REPEAT_AUDIO_PHONE_DOWN, null);
-
                     // Wenn Roboter das Ziel erreicht hat
-                    case "ROBOTER_REACHED_GOAL":
+                    case "ROBOT_REACHED_GOAL":
                         return new ResponseResult(ResponseType.ROBOT_REACHED_GOAL, null);
 
                     // Timeout vom Server erhalten

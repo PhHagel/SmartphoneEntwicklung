@@ -34,8 +34,11 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
             boolean success = false;
             try {
                 URL url = new URL(Konstanten.DOWNLOAD_SPRACHE_URL);
+                Log.d("AudioDownload", "✅ Downloading audio from: " + url);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
                 connection.connect();
+
 
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     InputStream input = connection.getInputStream();
@@ -55,7 +58,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
 
                 connection.disconnect();
             } catch (Exception e) {
-                Log.e("AudioDownload", "Fehler beim Download", e);
+                Log.e("AudioDownload", "✅ Fehler beim Download", e);
             }
 
             boolean finalSuccess = success;
@@ -89,8 +92,6 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
 
     private void handleServerResponse(ResponseResult result) {
         switch (result.getType()) {
-
-            // hier könnte noch rein, wenn die Audio erneut abgespielt werden soll
 
             case FAILURE:
                 Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();

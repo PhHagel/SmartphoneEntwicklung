@@ -14,5 +14,4 @@ public enum ResponseType {
     PERSON_DATA,
     PERSON_DATA_SUCCESS_FALSE,
     ROBOT_REACHED_GOAL,
-    REPEAT_AUDIO_PHONE_DOWN
 }

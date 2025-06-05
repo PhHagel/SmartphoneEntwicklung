@@ -2,6 +2,8 @@ package com.philipp.dv_projekt;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -9,12 +11,22 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SmartphoneBackActivity extends AppCompatActivity implements WebSocketCallback {
 
+    private final Handler audioHandler = new Handler(Looper.getMainLooper());
+    private final Runnable playAudioRunnable = new Runnable() {
+        @Override
+        public void run() {
+            AudioPlayerHelper.playAudio(SmartphoneBackActivity.this, R.raw.smartphonezurueklegen, null);
+            audioHandler.postDelayed(this, 20000);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smartphone_back);
 
-        AudioPlayerHelper.playAudio(this, R.raw.smartphonezurueklegen, null);
+        // Audio direkt abspielen und Timer starten
+        audioHandler.post(playAudioRunnable);
     }
 
     @Override
@@ -33,13 +45,10 @@ public class SmartphoneBackActivity extends AppCompatActivity implements WebSock
 
     private void handleMessageResponse(ResponseResult result) {
         switch (result.getType()) {
+
             case PHONE_IS_BACK:
                 startActivity(new Intent(this, StandbyActivity.class));
                 finish();
-                break;
-
-            case REPEAT_AUDIO_PHONE_DOWN:
-                AudioPlayerHelper.playAudio(this, R.raw.smartphonezurueklegen, null);
                 break;
 
             case FAILURE:

@@ -164,12 +164,12 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                     resetAndPlay(R.raw.angenommenertermin);
                     if (AudioPlayerHelper.isPlaying()) {
                         AudioPlayerHelper.setOnCompletionListener(mp -> {
-                            Intent intent = new Intent(RecordTerminActivity.this, MainActivity.class);
+                            Intent intent = new Intent(RecordTerminActivity.this, StandbyActivity.class);
                             startActivity(intent);
                             finish();
                         });
                     } else {
-                        Intent intent = new Intent(RecordTerminActivity.this, MainActivity.class);
+                        Intent intent = new Intent(RecordTerminActivity.this, StandbyActivity.class);
                         startActivity(intent);
                         finish();
                     }

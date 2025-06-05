@@ -1,7 +1,7 @@
 package com.philipp.dv_projekt;
 
 public class Konstanten {
-    public static final String SERVER_IP = "192.168.10.128";
+    public static final String SERVER_IP = "192.168.19.95";
     public static final String API_PORT = "3000";
     public static final String WS_PORT = "3001";
     public static final String UPLOAD_SPRACHE_ORDNER = "upload/sprache";
