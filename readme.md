@@ -2,7 +2,7 @@
 
 ## 🩺 Projektbeschreibung
 
-Die **PHANDAM-App** ist Teil eines Projekts im Rahmen des Studiengangs an der Hochschule Kempten. Sie ergänzt das Zusammenspiel von Hard- und Software im Empfangsbereich der „Arztpraxis XYZ“ und dient als benutzerfreundliche Schnittstelle zur Aufnahme und Weiterleitung von Bild- und Audiodaten.
+Die **PHANDAM-App** ist Teil eines Projekts im Rahmen des Studiengangs Informatik an der Hochschule Kempten. Sie ergänzt das Zusammenspiel von Hard- und Software im Empfangsbereich der „Arztpraxis XYZ“ und dient als benutzerfreundliche Schnittstelle zur Aufnahme und Weiterleitung von Bild- und Audiodaten.
 
 ### Hauptfunktionen:
 
@@ -10,7 +10,7 @@ Die **PHANDAM-App** ist Teil eines Projekts im Rahmen des Studiengangs an der Ho
 - Weiterleitung der Dateien an einen zentralen Server
 - Sprachgesteuerte Interaktionen mit dem System
 - Terminvereinbarung durch Sprachaufnahme
-- Erfassung von Neukunden durch Spracheingabe
+- Erfassung von Neukunden durch Sprachaufnahme
 
 ---
 
@@ -19,7 +19,7 @@ Die **PHANDAM-App** ist Teil eines Projekts im Rahmen des Studiengangs an der Ho
 - **Programmiersprache:** Java
 - **Buildsystem:** Gradle
 - **Entwicklungsumgebung:** Android Studio
-- **Android-Version:** API Level 33 (Android 13) oder höher
+- **Android-Version:** NUR API Level 33 (Android 13)
 - **Zusätzliche Bibliotheken:** Diverse Android- und Netzwerk-Bibliotheken (nicht einzeln aufgeführt)
 
 ---
@@ -42,14 +42,14 @@ Die App ist nicht über den Google Play Store verfügbar. Die Installation erfol
 Nach erfolgreicher Installation:
 
 - Die App erscheint im App-Menü und kann dort gestartet werden.
-- Eine sprachgestützte Benutzerführung übernimmt die Interaktion.
-- Die App dient als Ein-/Ausgabe-Modul für das übergeordnete System und reagiert automatisch auf Nutzereingaben.
+- Die App wird durch den Nutzer gesteuert und bietet dabei eine sprachgestützte Benutzerführung.
+- Die App dient als Ein-/Ausgabe-Modul für das Gesamtsystem und reagiert automatisch auf Nutzereingaben und Nachrichten vom Server.
 
 ---
 
 ## 📱 Systemvoraussetzungen
 
-- **Android-Version:** 13 (API-33) oder höher
+- **Android-Version:** Genau Android 13 (API-Level 33) – spätere oder frühere Versionen werden nicht unterstützt.
 - **Hardwareanforderungen:**
   - Frontkamera (Displayseite)
   - Mikrofon
