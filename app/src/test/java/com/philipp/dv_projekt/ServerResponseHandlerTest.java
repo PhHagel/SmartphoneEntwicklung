@@ -112,7 +112,7 @@ public class ServerResponseHandlerTest {
 
     @Test
     public void testRobotReachedGoal() {
-        String json = "{\"type\":\"ROBOTER_REACHED_GOAL\"}";
+        String json = "{\"type\":\"ROBOT_REACHED_GOAL\"}";
         ResponseResult result = handler.getResponseType(json);
         assertEquals(ResponseType.ROBOT_REACHED_GOAL, result.getType());
     }
