@@ -231,4 +231,21 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
         return super.dispatchTouchEvent(ev);
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (recorder != null) {
+            try {
+                recorder.stop();
+            } catch (RuntimeException e) {
+                Log.w("RecordPersonActivity", "Recorder konnte nicht gestoppt werden: " + e.getMessage());
+            } finally {
+                recorder.release();
+                recorder = null;
+            }
+        }
+    }
+
 }

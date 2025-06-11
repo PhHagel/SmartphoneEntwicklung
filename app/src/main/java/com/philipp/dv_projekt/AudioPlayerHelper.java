@@ -44,6 +44,7 @@ public class AudioPlayerHelper {
 
             player.prepareAsync();
         } catch (Exception e) {
+            release();
             Toast.makeText(context, "Fehler beim Abspielen: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }

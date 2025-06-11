@@ -25,6 +25,8 @@ public class SmartphoneBackActivity extends AppCompatActivity implements WebSock
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smartphone_back);
         audioHandler.post(playAudioRunnable);
+
+        WebSocketManager.getInstance().setCallback(this);
     }
 
 
@@ -69,6 +71,13 @@ public class SmartphoneBackActivity extends AppCompatActivity implements WebSock
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("MainActivity", "📨 Systemnachricht: " + systemText);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        audioHandler.removeCallbacks(playAudioRunnable);
     }
 
 }

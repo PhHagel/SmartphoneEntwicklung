@@ -26,6 +26,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_play);
+        WebSocketManager.getInstance().setCallback(this);
 
         downloadAndPlayAudio();
     }
@@ -102,7 +103,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
 
             case ROBOT_REACHED_GOAL:
                 startActivity(new Intent(this, SmartphoneBackActivity.class));
-                onDestroy();
+                finish();
                 break;
 
             case UNKNOWN_RESPONSE:
@@ -125,7 +126,6 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AudioPlayerHelper.release();
 
         if (localAudioFile != null && localAudioFile.exists()) {
             if (localAudioFile.delete()) {

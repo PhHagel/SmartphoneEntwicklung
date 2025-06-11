@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageCapture imageCapture;
     private PreviewView previewView;
     private Intent timeoutIntent;
+    private static final int REQUEST_CAMERA = 100;
+    private static final int REQUEST_MICROPHONE = 101;
+    private static final int REQUEST_MEDIA_IMAGES = 102;
 
 
     @Override
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         previewView = findViewById(R.id.previewView);
         timeoutIntent = new Intent(this, TimeoutService.class);
 
+        checkAndRequestPermissions();
 
         WebSocketManager.getInstance().setCallback(this);
         WebSocketManager.getInstance().connect();
@@ -55,14 +59,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
         bBildAufnehmen.setOnClickListener(this);
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);
-        }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE}, 100);
-        }
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
@@ -78,6 +74,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         AudioPlayerHelper.playAudio(this, R.raw.bildaufnehmen, () -> startService(timeoutIntent));
 
+    }
+
+
+    private void checkAndRequestPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_MICROPHONE);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_MEDIA_IMAGES);
+        }
     }
 
 
@@ -118,9 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void capturePhoto() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
-        }
 
         File photoDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Pictures");
         if (!photoDir.exists() && !photoDir.mkdirs()) {
@@ -230,7 +238,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     startActivity(new Intent(this, RecordTerminActivity.class));
                 }
-
                 finish();
                 break;
 
@@ -263,7 +270,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        // Reset an den Service schicken
         Intent reset = new Intent("com.philipp.ACTION_RESET_TIMEOUT");
         LocalBroadcastManager.getInstance(this).sendBroadcast(reset);
 

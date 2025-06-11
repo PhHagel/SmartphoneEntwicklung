@@ -85,7 +85,6 @@ public class StandbyActivity extends AppCompatActivity implements SensorEventLis
     }
 
 
-    // Diese Methode ist für den SensorEventListener erforderlich, wird aber in dieser Aktivität nicht verwendet.
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
@@ -101,7 +100,7 @@ public class StandbyActivity extends AppCompatActivity implements SensorEventLis
             switch (result.getType()) {
 
                 case AUDIO_GENERATION_REQUEST_FAILURE:
-                    Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Fehler in AUDIO_GENERATION_REQUEST: " + result.getMessage(), Toast.LENGTH_SHORT).show();
                     break;
 
                 case AUDIO_GENERATION_REQUEST_SUCCESS:
@@ -131,6 +130,20 @@ public class StandbyActivity extends AppCompatActivity implements SensorEventLis
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("SplashActivity", "📨 Systemnachricht: " + systemText);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
+        }
+
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
     }
 
 }
