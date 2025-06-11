@@ -13,5 +13,5 @@ public enum ResponseType {
     PHONE_IS_BACK,
     PERSON_DATA,
     PERSON_DATA_SUCCESS_FALSE,
-    ROBOT_REACHED_GOAL,
+    ROBOT_REACHED_GOAL
 }

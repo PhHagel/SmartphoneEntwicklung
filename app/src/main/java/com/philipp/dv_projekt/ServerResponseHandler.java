@@ -43,7 +43,6 @@ public class ServerResponseHandler {
                         }
                         return new ResponseResult(ResponseType.FAILURE, "Keine Message vorhanden");
 
-
                     // Für erkannte Patienten
                     case "KNOWN_CUSTOMER":
                         if (json.has("appointment")) {
@@ -56,11 +55,11 @@ public class ServerResponseHandler {
                         }
                         return new ResponseResult(ResponseType.FAILURE, "appointment fehlt in KNOWN_CUSTOMER");
 
-                    // Nächster Termin übergeben
+                    // Nächster Termin vom Server erhalten
                     case "NEXT_APPOINTMENT":
                         return new ResponseResult(ResponseType.NEXT_APPOINTMENT, jsonString);
 
-                    // Wenn Personendaten übergeben werden sollen
+                    // Wenn Personendaten vom Server kommen
                     case "PERSON_DATA":
                         if (json.has("success")) {
                             String successStr = json.get("success").getAsString();
@@ -76,7 +75,7 @@ public class ServerResponseHandler {
                     case "PHONE_IS_BACK":
                         return new ResponseResult(ResponseType.PHONE_IS_BACK, null);
 
-                    // Wenn Roboter das Ziel erreicht hat
+                    // Wenn Roboter das Ziel erreicht hat (Wartezimmer/Behandlungsraum)
                     case "ROBOT_REACHED_GOAL":
                         return new ResponseResult(ResponseType.ROBOT_REACHED_GOAL, null);
 

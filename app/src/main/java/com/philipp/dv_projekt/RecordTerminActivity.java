@@ -18,12 +18,14 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class RecordTerminActivity extends AppCompatActivity implements WebSocketCallback {
+
     private MediaRecorder recorder;
     private String filePath;
     private Button startBtn;
     private Button stopBtn;
     private File audioFile;
     private Intent timeoutIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
             }
         });
 
+
         stopBtn.setOnClickListener(v -> {
             try {
                 recorder.stop();
@@ -86,15 +89,14 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
             recorder = null;
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
-            Toast.makeText(this, "✅ Aufnahme gespeichert unter: " + filePath, Toast.LENGTH_SHORT).show(); // nur zum Testen
 
-            // Hier soll die Audio zum Server gesendet werden
             audioFile = new File(filePath);
             UploadHelper.uploadAudio(audioFile, Konstanten.UPLOAD_SPRACHE_URL, OkHttpManager.getInstance());
 
             AudioPlayerHelper.playAudio(this, R.raw.audiotoserver, null);
 
         });
+
 
         closeBtn.setOnClickListener(v -> {
             if (recorder != null) {
@@ -114,6 +116,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         });
     }
 
+
     @Override
     public void onMessageReceived(String jsonText) {
         ServerResponseHandler handler = new ServerResponseHandler();
@@ -128,13 +131,13 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         });
     }
 
+
     private void handleMessageResponse(ResponseResult result) {
 
         TextView datumTextView = findViewById(R.id.DatenTextTermin);
 
         switch (result.getType()) {
 
-            // TODO prüfen
             case NEXT_APPOINTMENT:
                 NextAppointmentResponse nextAppointmentResponse = new Gson().fromJson(result.getMessage(), NextAppointmentResponse.class);
 
@@ -155,10 +158,10 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 String antwort = result.getMessage();
                 Log.d("RecordTerminActivity", "📨 Antwort JA/NEIN: " + antwort);
                 if ("NO".equals(antwort)) {
+                    startBtn.setEnabled(true);
                     Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.abgelehntertermin);
                     datumTextView.setText("");
-                    startBtn.setEnabled(true);
                 } else if ("YES".equals(antwort)) {
                     Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.angenommenertermin);
@@ -184,14 +187,17 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
         }
     }
 
+
     private void resetAndPlay(int rawResourceId) {
         AudioPlayerHelper.playAudio(this, rawResourceId, null);
     }
+
 
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("RecordTerminActivity", "📨 Systemnachricht: " + systemText);
     }
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -200,6 +206,5 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         return super.dispatchTouchEvent(ev);
     }
-
 
 }

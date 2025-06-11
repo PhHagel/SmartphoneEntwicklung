@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SmartphoneBackActivity extends AppCompatActivity implements WebSocketCallback {
@@ -20,14 +19,14 @@ public class SmartphoneBackActivity extends AppCompatActivity implements WebSock
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smartphone_back);
-
-        // Audio direkt abspielen und Timer starten
         audioHandler.post(playAudioRunnable);
     }
+
 
     @Override
     public void onMessageReceived(String jsonText) {
@@ -42,6 +41,7 @@ public class SmartphoneBackActivity extends AppCompatActivity implements WebSock
             }
         });
     }
+
 
     private void handleMessageResponse(ResponseResult result) {
         switch (result.getType()) {
@@ -65,9 +65,10 @@ public class SmartphoneBackActivity extends AppCompatActivity implements WebSock
         }
     }
 
-    // on Message Handler für System-Nachrichten vom Server
+
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("MainActivity", "📨 Systemnachricht: " + systemText);
     }
+
 }

@@ -135,22 +135,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
         imageCapture.takePicture(
-                outputFileOptions,
-                ContextCompat.getMainExecutor(this),
-                new ImageCapture.OnImageSavedCallback() {
-                    @Override
-                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                        // Der Toast muss später noch weg
-                        Toast.makeText(MainActivity.this, "📸 Foto gespeichert!", Toast.LENGTH_SHORT).show();
-                        Log.d("MainActivity", "✅ Foto gespeichert unter: " + photoFile.getAbsolutePath());
-                        showPhoto(photoFile);
-                    }
-
-                    @Override
-                    public void onError(@NonNull ImageCaptureException exception) {
-                        Toast.makeText(MainActivity.this, "❌ Fehler beim Speichern: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+            outputFileOptions,
+            ContextCompat.getMainExecutor(this),
+            new ImageCapture.OnImageSavedCallback() {
+                @Override
+                public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                    Log.d("MainActivity", "✅ Foto gespeichert unter: " + photoFile.getAbsolutePath());
+                    showPhoto(photoFile);
                 }
+
+                @Override
+                public void onError(@NonNull ImageCaptureException exception) {
+                    Toast.makeText(MainActivity.this, "❌ Fehler beim Verarbeiten: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
         );
     }
 
@@ -164,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button imageAcceptBtn = dialog.findViewById(R.id.imageAcceptBtn);
 
         imageCheckView.setImageURI(Uri.fromFile(photoFile));
+        imageCheckView.setScaleX(-1f); // Vorschau spiegeln
         dialog.show();
 
         imageDeleteBtn.setOnClickListener(v -> {
@@ -176,13 +175,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         imageAcceptBtn.setOnClickListener(v -> {
-            Toast.makeText(this, "✅ Foto akzeptiert!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
 
             UploadHelper.uploadImage(photoFile, Konstanten.UPLOAD_BILD_URL, OkHttpManager.getInstance());
-
-            // Debug Helper dies das
-            //WebSocketManager.getInstance().sendMessage("{\"type\":\"DEBUG\", \"mode\":\"Gesichtsupload\",\"value\":\"1\"}");
 
             this.stopService(timeoutIntent);
 
@@ -260,7 +255,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    // on Message Handler für System-Nachrichten vom Server
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("MainActivity", "📨 Systemnachricht: " + systemText);

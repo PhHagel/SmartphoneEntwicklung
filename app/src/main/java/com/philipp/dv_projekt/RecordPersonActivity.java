@@ -15,13 +15,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
 public class RecordPersonActivity extends AppCompatActivity implements WebSocketCallback {
-
 
     private File audioFile;
     private String filePath;
@@ -78,6 +76,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
             }
         });
 
+
         stopBtn.setOnClickListener(v -> {
 
             this.stopService(timeoutIntent);
@@ -94,7 +93,6 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
             recorder = null;
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
-            Toast.makeText(this, "✅ Aufnahme gespeichert unter: " + filePath, Toast.LENGTH_SHORT).show(); // nur zum Testen
 
             audioFile = new File(filePath);
             UploadHelper.uploadAudio(audioFile, Konstanten.UPLOAD_SPRACHE_URL, OkHttpManager.getInstance());
@@ -102,6 +100,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
             AudioPlayerHelper.playAudio(this, R.raw.audiotoserver, null);
 
         });
+
 
         closeBtn.setOnClickListener(v -> {
             if (recorder != null) {
@@ -214,7 +213,6 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
             message.addProperty("Answer", "TRUE");
             WebSocketManager.getInstance().sendMessage(message.toString());
 
-            Toast.makeText(this, "✅ Person akzeptiert!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, RecordTerminActivity.class));
             dialog.dismiss();
         });
@@ -227,10 +225,10 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        // Reset an den Service schicken
         Intent reset = new Intent("com.philipp.ACTION_RESET_TIMEOUT");
         LocalBroadcastManager.getInstance(this).sendBroadcast(reset);
 
         return super.dispatchTouchEvent(ev);
     }
+
 }

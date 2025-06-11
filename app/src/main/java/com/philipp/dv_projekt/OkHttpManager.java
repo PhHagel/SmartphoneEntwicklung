@@ -6,9 +6,9 @@ public class OkHttpManager {
 
     private static OkHttpClient instance;
 
-    private OkHttpManager() {
-        // private Konstruktor, damit niemand instanziert
-    }
+
+    private OkHttpManager() {}
+
 
     public static OkHttpClient getInstance() {
         if (instance == null) {
@@ -16,4 +16,5 @@ public class OkHttpManager {
         }
         return instance;
     }
+
 }

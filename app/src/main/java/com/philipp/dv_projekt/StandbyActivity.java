@@ -17,10 +17,8 @@ import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-
 @SuppressLint("CustomSplashScreen")
 public class StandbyActivity extends AppCompatActivity implements SensorEventListener, WebSocketCallback {
-
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -87,10 +85,9 @@ public class StandbyActivity extends AppCompatActivity implements SensorEventLis
     }
 
 
+    // Diese Methode ist für den SensorEventListener erforderlich, wird aber in dieser Aktivität nicht verwendet.
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Wird nicht benötigt
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
 
     @Override

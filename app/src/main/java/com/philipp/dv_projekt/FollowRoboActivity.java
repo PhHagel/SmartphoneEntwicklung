@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class FollowRoboActivity extends AppCompatActivity implements WebSocketCallback {
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,14 +15,9 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
 
         WebSocketManager.getInstance().setCallback(this);
 
-        // Wenn der Server die richtige ROBOTER_REACHED_GOAL senden kann, dann das schreiben:
         AudioPlayerHelper.playAudio(this, R.raw.roboterfolgen, null);
-
-//        AudioPlayerHelper.playAudio(this, R.raw.roboterfolgen, () -> {
-//            startActivity(new Intent(this, SmartphoneBackActivity.class));
-//            finish();
-//        }, false);
     }
+
 
     @Override
     public void onMessageReceived(String jsonText) {
@@ -38,6 +32,7 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
             }
         });
     }
+
 
     private void handleMessageResponse(ResponseResult result) {
 
@@ -60,12 +55,12 @@ public class FollowRoboActivity extends AppCompatActivity implements WebSocketCa
                 Toast.makeText(this, "Fehler in der implementierung!!!", Toast.LENGTH_SHORT).show();
                 break;
         }
-
-
     }
+
 
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("FollowRoboActivity", "📨 Systemnachricht: " + systemText);
     }
+
 }

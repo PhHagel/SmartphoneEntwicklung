@@ -14,12 +14,12 @@ public class WebSocketClient {
         this.callback = callback;
     }
 
+
     public void connect() {
-        // Holt den Client direkt aus dem Singleton
         OkHttpClient client = OkHttpManager.getInstance();
 
         Request request = new Request.Builder()
-                .url(Konstanten.WS_URL)  // ← IP des Servers samt Port
+                .url(Konstanten.WS_URL)
                 .build();
 
         webSocket = client.newWebSocket(request, new WebSocketListener() {
@@ -33,7 +33,6 @@ public class WebSocketClient {
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
                 System.out.println("📨 Nachricht empfangen: " + text);
 
-                // Systemnachrichten filtern
                 if (!text.trim().startsWith("{")) {
                     if (callback != null) {
                         callback.onSystemMessageReceived(text);
@@ -62,15 +61,11 @@ public class WebSocketClient {
         });
     }
 
+
     public void sendMessage(String message) {
         if (webSocket != null) {
             webSocket.send(message);
         }
     }
 
-    public void disconnect() {
-        if (webSocket != null) {
-            webSocket.close(1000, "App geschlossen");
-        }
-    }
 }

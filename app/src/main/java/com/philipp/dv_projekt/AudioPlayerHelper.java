@@ -9,6 +9,7 @@ public class AudioPlayerHelper {
 
     private static MediaPlayer player;
 
+
     public static void playAudio(Context context, int audioResId, Runnable onCompletion) {
         release();
 
@@ -22,6 +23,7 @@ public class AudioPlayerHelper {
 
         player.start();
     }
+
 
     public static void playAudioFile(Context context, String filePath, Runnable onCompletion) {
         release();
@@ -46,9 +48,11 @@ public class AudioPlayerHelper {
         }
     }
 
+
     public static boolean isPlaying() {
         return player != null && player.isPlaying();
     }
+
 
     public static void release() {
         if (player != null) {
@@ -60,9 +64,11 @@ public class AudioPlayerHelper {
         }
     }
 
+
     public static void setOnCompletionListener(MediaPlayer.OnCompletionListener listener) {
         if (player != null) {
             player.setOnCompletionListener(listener);
         }
     }
+
 }

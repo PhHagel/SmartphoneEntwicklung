@@ -10,11 +10,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-
 public class TimeoutService extends Service {
 
-
-    private static final long TIMEOUT_IN_MILLIS = 30_000;  // 30 Sekunden später
+    private static final long TIMEOUT_IN_MILLIS = 30_000;
     private Handler timeoutHandler;
     private Runnable timeoutRunnable;
 
@@ -30,30 +28,24 @@ public class TimeoutService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Handler auf dem Main–Looper
         timeoutHandler = new Handler(Looper.getMainLooper());
 
-        // Runnable, das bei Timeout die SplashActivity startet
         timeoutRunnable = () -> {
             Intent splash = new Intent(TimeoutService.this, StandbyActivity.class);
             splash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(splash);
-            stopSelf();  // Service beenden, falls gewünscht
+            stopSelf();
         };
 
-        // Receiver registrieren
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(resetReceiver, new IntentFilter("com.philipp.ACTION_RESET_TIMEOUT"));
 
-        // Erstmal Timeout starten
         restartTimeout();
     }
 
 
     private void restartTimeout() {
-        // ggf. vorhandenes Runnable abbrechen
         timeoutHandler.removeCallbacks(timeoutRunnable);
-        // neuen Countdown starten
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_IN_MILLIS);
     }
 
@@ -61,7 +53,6 @@ public class TimeoutService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_IN_MILLIS);
-        // Service im Hintergrund weiterlaufen lassen
         return START_STICKY;
     }
 
@@ -69,7 +60,6 @@ public class TimeoutService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Aufräumen
         timeoutHandler.removeCallbacks(timeoutRunnable);
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(resetReceiver);
@@ -78,8 +68,7 @@ public class TimeoutService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null; // Nicht gebunden
+        return null;
     }
-
 
 }

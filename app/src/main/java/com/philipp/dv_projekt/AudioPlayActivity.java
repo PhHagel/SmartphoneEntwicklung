@@ -21,6 +21,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +29,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
 
         downloadAndPlayAudio();
     }
+
 
     private void downloadAndPlayAudio() {
         executor.execute(() -> {
@@ -90,6 +92,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
         });
     }
 
+
     private void handleServerResponse(ResponseResult result) {
         switch (result.getType()) {
 
@@ -112,10 +115,12 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
         }
     }
 
+
     @Override
     public void onSystemMessageReceived(String systemText) {
         Log.d("AudioPlayActivity", "📨 Systemnachricht: " + systemText);
     }
+
 
     @Override
     protected void onDestroy() {
@@ -132,4 +137,5 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
 
         executor.shutdown();
     }
+
 }
