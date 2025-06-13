@@ -2,6 +2,8 @@ package com.philipp.dv_projekt;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
@@ -186,6 +188,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
     private void showNewUserData(String userDataFromServer) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_new_user);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         TextView textCheckView = dialog.findViewById(R.id.textCheckView);
         Button userDeleteBtn = dialog.findViewById(R.id.userDeleteBtn);

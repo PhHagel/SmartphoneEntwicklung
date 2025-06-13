@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -29,6 +31,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import java.io.File;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
@@ -164,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showPhoto(File photoFile) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_photo_preview);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         ImageView imageCheckView = dialog.findViewById(R.id.imageCheckView);
         Button imageDeleteBtn = dialog.findViewById(R.id.imageDeleteBtn);

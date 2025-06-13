@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#F0F4F8" >
+    android:background="#F0F4F8">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primaryBlue"
-        android:minHeight="50dp"
         app:title="Arztpraxis XYZ"
         app:titleCentered="true"
-        app:titleTextColor="@color/lightBlue" />
+        app:titleTextColor="@color/lightBlue"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/infoText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="103dp"
+        android:layout_margin="30dp"
         android:gravity="center"
         android:text="@string/bitte_heben_sie_das_ger_t_vorsichtig_vom_roboter_hoch_und_folgen_sie_dem_roboter"
         android:textAlignment="center"
         android:textColor="#333333"
-        android:textSize="60sp" />
+        android:textSize="50sp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toTopOf="@id/footer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/footer"
@@ -35,7 +40,8 @@
         android:text="@string/patienten_terminal_v1_0"
         android:textSize="14sp"
         android:textColor="#000000"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp" />
-</RelativeLayout>
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

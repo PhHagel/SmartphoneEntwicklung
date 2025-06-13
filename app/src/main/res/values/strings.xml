@@ -29,4 +29,5 @@
     <string name="bitte_folgen_sie_dem_roboter">Bitte heben Sie das Smartphone hoch und folgen Sie dem Roboter</string>
     <string name="bitte_heben_sie_das_ger_t_vorsichtig_vom_roboter_hoch_und_folgen_sie_dem_roboter">Bitte heben Sie das Gerät vorsichtig vom Roboter hoch und folgen Sie dem Roboter.</string>
     <string name="pr_fen_sie_bitte_die_angegebenen_daten">Prüfen Sie bitte die angegebenen Daten</string>
+    <string name="bitte_pr_fen_sie_das_aufgenommene_bild">Bitte prüfen Sie, ob Sie gut erkennbar sind</string>
 </resources>
