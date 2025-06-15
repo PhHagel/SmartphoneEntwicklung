@@ -28,6 +28,9 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
     private MediaRecorder recorder;
     private Button startBtn;
     private Button stopBtn;
+    private LottieAnimationView aufnahmeGreen;
+    private LottieAnimationView aufnahmeAnimation;
+    private LottieAnimationView aufnahmeBeendet;
     private Intent timeoutIntent;
 
 
@@ -45,7 +48,12 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
         WebSocketManager.getInstance().setCallback(this);
 
-        LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
+        aufnahmeGreen = findViewById(R.id.aufnahmeGreen);
+        aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
+        aufnahmeBeendet = findViewById(R.id.aufnahmeBeendet);
+
+        aufnahmeGreen.setVisibility(View.VISIBLE);
+
 
         AudioPlayerHelper.playAudio(this, R.raw.tonaufnehmen, () -> startService(timeoutIntent));
 
@@ -70,6 +78,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(true);
 
+                aufnahmeGreen.setVisibility(View.GONE);
                 aufnahmeAnimation.setVisibility(View.VISIBLE);
                 aufnahmeAnimation.playAnimation();
                 aufnahmeAnimation.setRepeatCount(3000);
@@ -87,7 +96,10 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
                 recorder.stop();
                 aufnahmeAnimation.cancelAnimation();
                 aufnahmeAnimation.setProgress(0f);
-                aufnahmeAnimation.setVisibility(View.INVISIBLE);
+                aufnahmeAnimation.setVisibility(View.GONE);
+                aufnahmeBeendet.setVisibility(View.VISIBLE);
+                aufnahmeBeendet.playAnimation();
+                aufnahmeBeendet.setRepeatCount(1);
             } catch (RuntimeException e) {
                 Toast.makeText(this, "❌ Fehler beim Stoppen der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -199,6 +211,9 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
         userDeleteBtn.setOnClickListener(v -> {
             if (audioFile.delete()) {
+
+                aufnahmeBeendet.setVisibility(View.GONE);
+                aufnahmeGreen.setVisibility(View.VISIBLE);
 
                 message.addProperty("Answer", "FALSE");
                 WebSocketManager.getInstance().sendMessage(message.toString());

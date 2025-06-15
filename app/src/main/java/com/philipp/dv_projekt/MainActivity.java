@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
@@ -35,12 +34,13 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, WebSocketCallback {
+public class MainActivity extends AppCompatActivity implements WebSocketCallback {
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
     private PreviewView previewView;
     private Intent timeoutIntent;
+    private Button bBildAufnehmen;
     private static final int REQUEST_CAMERA = 100;
     private static final int REQUEST_MICROPHONE = 101;
     private static final int REQUEST_MEDIA_IMAGES = 102;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button bBildAufnehmen = findViewById(R.id.bCapture);
+        bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
         timeoutIntent = new Intent(this, TimeoutService.class);
 
@@ -61,7 +61,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
-        bBildAufnehmen.setOnClickListener(this);
+        bBildAufnehmen.setOnClickListener(v -> {
+            bBildAufnehmen.setEnabled(false);
+            capturePhoto();
+        });
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
@@ -122,15 +125,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    @SuppressLint("RestrictedApi")
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.bCapture) {
-            capturePhoto();
-        }
-    }
-
-
     private void capturePhoto() {
 
         File photoDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Pictures");
@@ -178,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.show();
 
         imageDeleteBtn.setOnClickListener(v -> {
+            bBildAufnehmen.setEnabled(true);
             if (photoFile.delete()) {
                 Toast.makeText(this, "✅ Foto gelöscht!", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();

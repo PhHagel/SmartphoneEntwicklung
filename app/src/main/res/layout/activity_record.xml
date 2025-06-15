@@ -47,15 +47,37 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/aufnahmeAnimation"
+    <FrameLayout
+        android:id="@+id/animationContainer"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="24dp"
-        app:lottie_rawRes="@raw/aufnahme"
         app:layout_constraintTop_toBottomOf="@id/DatenText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/aufnahmeGreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_rawRes="@raw/aufnahmegreen"
+            android:visibility="visible"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/aufnahmeAnimation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_rawRes="@raw/aufnahme"
+            android:visibility="gone"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/aufnahmeBeendet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_rawRes="@raw/aufnahmebeendet"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_start_recording"
@@ -68,7 +90,7 @@
         android:textSize="16sp"
         app:cornerRadius="15dp"
         android:backgroundTint="@color/primaryBlue"
-        app:layout_constraintTop_toBottomOf="@id/aufnahmeAnimation"
+        app:layout_constraintTop_toBottomOf="@id/animationContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

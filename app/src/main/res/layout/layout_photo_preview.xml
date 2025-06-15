@@ -69,7 +69,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/imageAcceptBtn"
             android:layout_width="130dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="@string/akzeptieren"
             android:textColor="@color/orange"
             android:textStyle="bold"
