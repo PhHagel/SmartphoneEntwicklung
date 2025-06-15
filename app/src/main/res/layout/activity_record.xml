@@ -60,22 +60,22 @@
             android:id="@+id/aufnahmeGreen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:lottie_rawRes="@raw/aufnahmegreen"
-            android:visibility="visible"/>
+            android:visibility="visible"
+            app:lottie_rawRes="@raw/aufnahmegreen" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/aufnahmeAnimation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:lottie_rawRes="@raw/aufnahme"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:lottie_rawRes="@raw/aufnahme" />
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/aufnahmeBeendet"
+            android:id="@+id/sendToServerAnimation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:lottie_rawRes="@raw/aufnahmebeendet"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:lottie_rawRes="@raw/sendtoserver" />
 
     </FrameLayout>
 

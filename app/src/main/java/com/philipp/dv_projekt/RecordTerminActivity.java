@@ -25,7 +25,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     private Button stopBtn;
     private LottieAnimationView aufnahmeGreen;
     private LottieAnimationView aufnahmeAnimation;
-    private LottieAnimationView aufnahmeBeendet;
+    private LottieAnimationView sendToServerAnimation;
     private File audioFile;
     private Intent timeoutIntent;
 
@@ -44,7 +44,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         aufnahmeGreen = findViewById(R.id.aufnahmeGreen);
         aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
-        aufnahmeBeendet = findViewById(R.id.aufnahmeBeendet);
+        sendToServerAnimation = findViewById(R.id.sendToServerAnimation);
 
         WebSocketManager.getInstance().setCallback(this);
 
@@ -90,9 +90,9 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 aufnahmeAnimation.cancelAnimation();
                 aufnahmeAnimation.setProgress(0f);
                 aufnahmeAnimation.setVisibility(View.GONE);
-                aufnahmeBeendet.setVisibility(View.VISIBLE);
-                aufnahmeBeendet.playAnimation();
-                aufnahmeBeendet.setRepeatCount(1);
+                sendToServerAnimation.setVisibility(View.VISIBLE);
+                sendToServerAnimation.playAnimation();
+                sendToServerAnimation.setRepeatCount(3000);
             } catch (RuntimeException e) {
                 Toast.makeText(this, "❌ Fehler beim Stoppen der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -170,7 +170,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 Log.d("RecordTerminActivity", "📨 Antwort JA/NEIN: " + antwort);
                 if ("NO".equals(antwort)) {
 
-                    aufnahmeBeendet.setVisibility(View.GONE);
+                    sendToServerAnimation.setVisibility(View.GONE);
                     aufnahmeGreen.setVisibility(View.VISIBLE);
 
                     startBtn.setEnabled(true);
@@ -178,6 +178,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                     resetAndPlay(R.raw.abgelehntertermin);
                     datumTextView.setText("");
                 } else if ("YES".equals(antwort)) {
+                                        sendToServerAnimation.setVisibility(View.GONE);
                     Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.angenommenertermin);
                     if (AudioPlayerHelper.isPlaying()) {

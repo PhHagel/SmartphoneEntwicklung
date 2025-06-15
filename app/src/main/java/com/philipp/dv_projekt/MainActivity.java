@@ -23,9 +23,11 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
     private PreviewView previewView;
     private Intent timeoutIntent;
     private Button bBildAufnehmen;
+    private LottieAnimationView sendToServerAnimation;
     private static final int REQUEST_CAMERA = 100;
     private static final int REQUEST_MICROPHONE = 101;
     private static final int REQUEST_MEDIA_IMAGES = 102;
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         setContentView(R.layout.activity_main);
         bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
+        sendToServerAnimation = findViewById(R.id.sendToServerAnimation);
         timeoutIntent = new Intent(this, TimeoutService.class);
 
         checkAndRequestPermissions();
@@ -184,6 +188,11 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         imageAcceptBtn.setOnClickListener(v -> {
             dialog.dismiss();
 
+            previewView.setVisibility(View.GONE);
+            sendToServerAnimation.setVisibility(View.VISIBLE);
+            sendToServerAnimation.playAnimation();
+            sendToServerAnimation.setRepeatCount(300);
+
             UploadHelper.uploadImage(photoFile, Konstanten.UPLOAD_BILD_URL, OkHttpManager.getInstance());
 
             this.stopService(timeoutIntent);
@@ -217,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
         switch (result.getType()) {
 
             case AUDIO_GENERATION_REQUEST_FAILURE:
-                Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Audiogenerierungsfehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
                 break;
 
             case AUDIO_GENERATION_REQUEST_SUCCESS:

@@ -30,7 +30,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
     private Button stopBtn;
     private LottieAnimationView aufnahmeGreen;
     private LottieAnimationView aufnahmeAnimation;
-    private LottieAnimationView aufnahmeBeendet;
+    private LottieAnimationView sendToServerAnimation;
     private Intent timeoutIntent;
 
 
@@ -50,7 +50,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
         aufnahmeGreen = findViewById(R.id.aufnahmeGreen);
         aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
-        aufnahmeBeendet = findViewById(R.id.aufnahmeBeendet);
+        sendToServerAnimation = findViewById(R.id.sendToServerAnimation);
 
         aufnahmeGreen.setVisibility(View.VISIBLE);
 
@@ -97,9 +97,9 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
                 aufnahmeAnimation.cancelAnimation();
                 aufnahmeAnimation.setProgress(0f);
                 aufnahmeAnimation.setVisibility(View.GONE);
-                aufnahmeBeendet.setVisibility(View.VISIBLE);
-                aufnahmeBeendet.playAnimation();
-                aufnahmeBeendet.setRepeatCount(1);
+                sendToServerAnimation.setVisibility(View.VISIBLE);
+                sendToServerAnimation.playAnimation();
+                sendToServerAnimation.setRepeatCount(300);
             } catch (RuntimeException e) {
                 Toast.makeText(this, "❌ Fehler beim Stoppen der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -212,7 +212,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
         userDeleteBtn.setOnClickListener(v -> {
             if (audioFile.delete()) {
 
-                aufnahmeBeendet.setVisibility(View.GONE);
+                sendToServerAnimation.setVisibility(View.GONE);
                 aufnahmeGreen.setVisibility(View.VISIBLE);
 
                 message.addProperty("Answer", "FALSE");
