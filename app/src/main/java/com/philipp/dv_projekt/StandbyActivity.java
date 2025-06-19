@@ -32,6 +32,8 @@ public class StandbyActivity extends AppCompatActivity implements SensorEventLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        WebSocketManager.getInstance().setCallback(this);
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         VibratorManager vibratorManager = (VibratorManager) getSystemService(Context.VIBRATOR_MANAGER_SERVICE);

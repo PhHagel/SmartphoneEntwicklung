@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.airbnb.lottie.LottieAnimationView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -20,6 +21,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
     private File localAudioFile;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private LottieAnimationView robotAnimation;
 
 
     @Override
@@ -27,7 +29,9 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_play);
         WebSocketManager.getInstance().setCallback(this);
-
+        robotAnimation = findViewById(R.id.robotAnimation);
+        robotAnimation.playAnimation();
+        robotAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
         downloadAndPlayAudio();
     }
 
@@ -102,6 +106,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
                 break;
 
             case ROBOT_REACHED_GOAL:
+                robotAnimation.cancelAnimation();
                 startActivity(new Intent(this, SmartphoneBackActivity.class));
                 finish();
                 break;

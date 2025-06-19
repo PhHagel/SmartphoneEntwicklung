@@ -2,6 +2,8 @@ package com.philipp.dv_projekt;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +28,9 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
     private MediaRecorder recorder;
     private Button startBtn;
     private Button stopBtn;
+    private LottieAnimationView aufnahmeGreen;
+    private LottieAnimationView aufnahmeAnimation;
+    private LottieAnimationView sendToServerAnimation;
     private Intent timeoutIntent;
 
 
@@ -43,7 +48,12 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
         WebSocketManager.getInstance().setCallback(this);
 
-        LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
+        aufnahmeGreen = findViewById(R.id.aufnahmeGreen);
+        aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
+        sendToServerAnimation = findViewById(R.id.sendToServerAnimation);
+
+        aufnahmeGreen.setVisibility(View.VISIBLE);
+
 
         AudioPlayerHelper.playAudio(this, R.raw.tonaufnehmen, () -> startService(timeoutIntent));
 
@@ -68,9 +78,10 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(true);
 
+                aufnahmeGreen.setVisibility(View.GONE);
                 aufnahmeAnimation.setVisibility(View.VISIBLE);
                 aufnahmeAnimation.playAnimation();
-                aufnahmeAnimation.setRepeatCount(3000);
+                aufnahmeAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
             } catch (IOException e) {
                 Toast.makeText(this, "❌ Fehler beim Starten der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -85,7 +96,10 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
                 recorder.stop();
                 aufnahmeAnimation.cancelAnimation();
                 aufnahmeAnimation.setProgress(0f);
-                aufnahmeAnimation.setVisibility(View.INVISIBLE);
+                aufnahmeAnimation.setVisibility(View.GONE);
+                sendToServerAnimation.setVisibility(View.VISIBLE);
+                sendToServerAnimation.playAnimation();
+                sendToServerAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
             } catch (RuntimeException e) {
                 Toast.makeText(this, "❌ Fehler beim Stoppen der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -186,6 +200,7 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
     private void showNewUserData(String userDataFromServer) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_new_user);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         TextView textCheckView = dialog.findViewById(R.id.textCheckView);
         Button userDeleteBtn = dialog.findViewById(R.id.userDeleteBtn);
@@ -196,6 +211,9 @@ public class RecordPersonActivity extends AppCompatActivity implements WebSocket
 
         userDeleteBtn.setOnClickListener(v -> {
             if (audioFile.delete()) {
+
+                sendToServerAnimation.setVisibility(View.GONE);
+                aufnahmeGreen.setVisibility(View.VISIBLE);
 
                 message.addProperty("Answer", "FALSE");
                 WebSocketManager.getInstance().sendMessage(message.toString());

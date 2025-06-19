@@ -1,114 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/record_popup_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F0F4F8">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primaryBlue"
-        android:minHeight="50dp"
-        app:layout_constraintTop_toTopOf="parent"
         app:title="Arztpraxis XYZ"
         app:titleCentered="true"
-        app:titleTextColor="@color/lightBlue" />
+        app:titleTextColor="@color/lightBlue"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/infoTextTermin"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="20dp"
+        android:layout_margin="24dp"
         android:text="@string/tippen_sie_bitte_auf_aufnahme_starten_und_sagen_sie_ja_wenn_sie_den_termin_annehmen_wollen_und_nein_falls_sie_den_termin_nicht_annehmen_wollen"
-        android:textAlignment="center"
         android:textColor="#333333"
+        android:textAlignment="center"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.482"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/DatenTextTermin"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
+        android:gravity="center"
         android:textColor="#333333"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/aufnahmeAnimation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@id/infoTextTermin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/infoTextTermin" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/aufnahmeAnimation"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
+    <FrameLayout
+        android:id="@+id/animationContainer"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintTop_toBottomOf="@id/DatenTextTermin"
-        app:lottie_rawRes="@raw/aufnahme" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <Button
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/aufnahmeGreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_rawRes="@raw/aufnahmegreen"
+            android:visibility="visible"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/aufnahmeAnimation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_rawRes="@raw/aufnahme"
+            android:visibility="gone"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/sendToServerAnimation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_rawRes="@raw/sendtoserver"
+            android:visibility="gone"/>
+
+    </FrameLayout>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_start_recording"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:backgroundTint="@color/primaryBlue"
+        android:layout_marginTop="24dp"
         android:text="@string/aufnahme_starten"
-        android:textColor="@color/lightBlue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        android:textColor="@color/orange"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:cornerRadius="15dp"
+        android:backgroundTint="@color/primaryBlue"
+        app:layout_constraintTop_toBottomOf="@id/animationContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/aufnahmeAnimation" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_stop_recording"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:backgroundTint="@color/primaryBlue"
+        android:layout_marginTop="12dp"
         android:enabled="false"
         android:text="@string/aufnahme_stoppen"
-        android:textColor="@color/lightBlue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        android:textColor="@color/orange"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:cornerRadius="15dp"
+        android:backgroundTint="@color/primaryBlue"
+        app:layout_constraintTop_toBottomOf="@id/btn_start_recording"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_start_recording" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_closePage"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/primaryBlue"
+        android:layout_marginTop="16dp"
         android:text="@string/seite_schlie_en"
-        android:textColor="@color/lightBlue"
-        app:layout_constraintBottom_toTopOf="@id/footer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="@color/orange"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:cornerRadius="15dp"
+        android:backgroundTint="@color/primaryBlue"
         app:layout_constraintTop_toBottomOf="@id/btn_stop_recording"
-        app:layout_constraintVertical_bias="0.887" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/footer"
+        app:layout_constraintVertical_bias="0.9" />
 
     <TextView
         android:id="@+id/footer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
         android:text="@string/patienten_terminal_v1_0"
         android:textColor="#000000"
         android:textSize="14sp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

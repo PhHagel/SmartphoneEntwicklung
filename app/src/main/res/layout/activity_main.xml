@@ -43,30 +43,50 @@
             android:textColor="#333333"
             android:textSize="20sp" />
 
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:layout_marginTop="25dp"
-            android:background="@color/primaryBlue">
+        <androidx.cardview.widget.CardView
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            android:layout_gravity="center"
+            android:layout_margin="20dp"
+            app:cardBackgroundColor="@color/primaryBlue"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
 
-            <androidx.camera.view.PreviewView
-                android:id="@+id/previewView"
+            <FrameLayout
                 android:layout_width="300dp"
                 android:layout_height="300dp"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:background="@drawable/circle_camera_shape"
+                android:clipToOutline="true">
 
-        </FrameLayout>
+                <androidx.camera.view.PreviewView
+                    android:id="@+id/previewView"
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:visibility="visible"/>
 
-        <Button
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/sendToServerAnimation"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:lottie_rawRes="@raw/sendtoserver"
+                    android:background="#FFFFFF"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/bCapture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="150dp"
+            android:layout_height="75dp"
             android:layout_gravity="center"
             android:layout_marginTop="25dp"
             android:backgroundTint="@color/primaryBlue"
+            android:textColor="@color/orange"
             android:text="@string/bild_aufnehmen"
-            android:textColor="@color/lightBlue" />
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:cornerRadius="15dp" />
 
     </LinearLayout>
 

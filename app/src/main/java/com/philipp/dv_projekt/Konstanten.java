@@ -11,5 +11,6 @@ public class Konstanten {
     public static final String UPLOAD_SPRACHE_URL = "http://" + SERVER_IP + ":" + API_PORT + "/" + UPLOAD_SPRACHE_ORDNER;
     public static final String DOWNLOAD_SPRACHE_URL = "http://" + SERVER_IP + ":" + API_PORT + "/" + DOWNLOAD_SPRACHE_ORDNER;
     public static final String WS_URL = "ws://" + SERVER_IP + ":" + WS_PORT;
+    public static final int LOTTY_REPEAT_COUNT = 3000;
 
 }

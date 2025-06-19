@@ -23,6 +23,9 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
     private String filePath;
     private Button startBtn;
     private Button stopBtn;
+    private LottieAnimationView aufnahmeGreen;
+    private LottieAnimationView aufnahmeAnimation;
+    private LottieAnimationView sendToServerAnimation;
     private File audioFile;
     private Intent timeoutIntent;
 
@@ -39,9 +42,13 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
 
         stopBtn.setEnabled(false);
 
+        aufnahmeGreen = findViewById(R.id.aufnahmeGreen);
+        aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
+        sendToServerAnimation = findViewById(R.id.sendToServerAnimation);
+
         WebSocketManager.getInstance().setCallback(this);
 
-        LottieAnimationView aufnahmeAnimation = findViewById(R.id.aufnahmeAnimation);
+        aufnahmeGreen.setVisibility(View.VISIBLE);
 
         AudioPlayerHelper.playAudio(this, R.raw.terminannehmen, null);
 
@@ -67,9 +74,10 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(true);
 
+                aufnahmeGreen.setVisibility(View.GONE);
                 aufnahmeAnimation.setVisibility(View.VISIBLE);
                 aufnahmeAnimation.playAnimation();
-                aufnahmeAnimation.setRepeatCount(3000);
+                aufnahmeAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
             } catch (IOException e) {
                 Toast.makeText(this, "❌ Fehler beim Starten der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -81,7 +89,10 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 recorder.stop();
                 aufnahmeAnimation.cancelAnimation();
                 aufnahmeAnimation.setProgress(0f);
-                aufnahmeAnimation.setVisibility(View.INVISIBLE);
+                aufnahmeAnimation.setVisibility(View.GONE);
+                sendToServerAnimation.setVisibility(View.VISIBLE);
+                sendToServerAnimation.playAnimation();
+                sendToServerAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
             } catch (RuntimeException e) {
                 Toast.makeText(this, "❌ Fehler beim Stoppen der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -158,11 +169,16 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 String antwort = result.getMessage();
                 Log.d("RecordTerminActivity", "📨 Antwort JA/NEIN: " + antwort);
                 if ("NO".equals(antwort)) {
+
+                    sendToServerAnimation.setVisibility(View.GONE);
+                    aufnahmeGreen.setVisibility(View.VISIBLE);
+
                     startBtn.setEnabled(true);
                     Toast.makeText(this, "❌ Termin abgelehnt!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.abgelehntertermin);
                     datumTextView.setText("");
                 } else if ("YES".equals(antwort)) {
+                                        sendToServerAnimation.setVisibility(View.GONE);
                     Toast.makeText(this, "✅ Termin akzeptiert!", Toast.LENGTH_SHORT).show();
                     resetAndPlay(R.raw.angenommenertermin);
                     if (AudioPlayerHelper.isPlaying()) {

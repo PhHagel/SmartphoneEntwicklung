@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -12,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
@@ -22,22 +23,27 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import java.io.File;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, WebSocketCallback {
+public class MainActivity extends AppCompatActivity implements WebSocketCallback {
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
     private PreviewView previewView;
     private Intent timeoutIntent;
+    private Button bBildAufnehmen;
+    private LottieAnimationView sendToServerAnimation;
     private static final int REQUEST_CAMERA = 100;
     private static final int REQUEST_MICROPHONE = 101;
     private static final int REQUEST_MEDIA_IMAGES = 102;
@@ -47,8 +53,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button bBildAufnehmen = findViewById(R.id.bCapture);
+        bBildAufnehmen = findViewById(R.id.bCapture);
         previewView = findViewById(R.id.previewView);
+        sendToServerAnimation = findViewById(R.id.sendToServerAnimation);
         timeoutIntent = new Intent(this, TimeoutService.class);
 
         checkAndRequestPermissions();
@@ -58,7 +65,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
-        bBildAufnehmen.setOnClickListener(this);
+        bBildAufnehmen.setOnClickListener(v -> {
+            bBildAufnehmen.setEnabled(false);
+            capturePhoto();
+        });
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
@@ -119,15 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    @SuppressLint("RestrictedApi")
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.bCapture) {
-            capturePhoto();
-        }
-    }
-
-
     private void capturePhoto() {
 
         File photoDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Pictures");
@@ -164,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showPhoto(File photoFile) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_photo_preview);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         ImageView imageCheckView = dialog.findViewById(R.id.imageCheckView);
         Button imageDeleteBtn = dialog.findViewById(R.id.imageDeleteBtn);
@@ -174,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.show();
 
         imageDeleteBtn.setOnClickListener(v -> {
+            bBildAufnehmen.setEnabled(true);
             if (photoFile.delete()) {
                 Toast.makeText(this, "✅ Foto gelöscht!", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
@@ -184,6 +187,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         imageAcceptBtn.setOnClickListener(v -> {
             dialog.dismiss();
+
+            previewView.setVisibility(View.GONE);
+            sendToServerAnimation.setVisibility(View.VISIBLE);
+            sendToServerAnimation.playAnimation();
+            sendToServerAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
 
             UploadHelper.uploadImage(photoFile, Konstanten.UPLOAD_BILD_URL, OkHttpManager.getInstance());
 
@@ -218,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (result.getType()) {
 
             case AUDIO_GENERATION_REQUEST_FAILURE:
-                Toast.makeText(this, "Fehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Audiogenerierungsfehler: " + result.getMessage(), Toast.LENGTH_SHORT).show();
                 break;
 
             case AUDIO_GENERATION_REQUEST_SUCCESS:
