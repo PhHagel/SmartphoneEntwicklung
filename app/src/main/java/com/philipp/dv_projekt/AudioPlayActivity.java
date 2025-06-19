@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.airbnb.lottie.LottieAnimationView;
@@ -32,7 +31,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
         WebSocketManager.getInstance().setCallback(this);
         robotAnimation = findViewById(R.id.robotAnimation);
         robotAnimation.playAnimation();
-        robotAnimation.setRepeatCount(3000);
+        robotAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
         downloadAndPlayAudio();
     }
 
@@ -107,7 +106,7 @@ public class AudioPlayActivity extends AppCompatActivity implements WebSocketCal
                 break;
 
             case ROBOT_REACHED_GOAL:
-                robotAnimation.setVisibility(View.GONE);
+                robotAnimation.cancelAnimation();
                 startActivity(new Intent(this, SmartphoneBackActivity.class));
                 finish();
                 break;

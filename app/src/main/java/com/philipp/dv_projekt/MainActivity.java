@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements WebSocketCallback
             previewView.setVisibility(View.GONE);
             sendToServerAnimation.setVisibility(View.VISIBLE);
             sendToServerAnimation.playAnimation();
-            sendToServerAnimation.setRepeatCount(300);
+            sendToServerAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
 
             UploadHelper.uploadImage(photoFile, Konstanten.UPLOAD_BILD_URL, OkHttpManager.getInstance());
 

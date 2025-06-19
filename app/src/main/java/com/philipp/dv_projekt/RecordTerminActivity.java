@@ -77,7 +77,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 aufnahmeGreen.setVisibility(View.GONE);
                 aufnahmeAnimation.setVisibility(View.VISIBLE);
                 aufnahmeAnimation.playAnimation();
-                aufnahmeAnimation.setRepeatCount(3000);
+                aufnahmeAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
             } catch (IOException e) {
                 Toast.makeText(this, "❌ Fehler beim Starten der Aufnahme", Toast.LENGTH_SHORT).show();
             }
@@ -92,7 +92,7 @@ public class RecordTerminActivity extends AppCompatActivity implements WebSocket
                 aufnahmeAnimation.setVisibility(View.GONE);
                 sendToServerAnimation.setVisibility(View.VISIBLE);
                 sendToServerAnimation.playAnimation();
-                sendToServerAnimation.setRepeatCount(3000);
+                sendToServerAnimation.setRepeatCount(Konstanten.LOTTY_REPEAT_COUNT);
             } catch (RuntimeException e) {
                 Toast.makeText(this, "❌ Fehler beim Stoppen der Aufnahme", Toast.LENGTH_SHORT).show();
             }
