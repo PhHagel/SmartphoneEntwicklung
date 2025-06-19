@@ -26,8 +26,9 @@ Die **PHANDAM-App** ist Teil eines Projekts im Rahmen des Studiengangs Informati
 
 ## 🛠️ Installation
 
-Die App ist nicht über den Google Play Store verfügbar. Die Installation erfolgt manuell über Android Studio:
 Vor der Installation sollte geprüft werden, ob die richtige IP-Adresse des Servers in der App konfiguriert ist, da sich diese von der Nutzungsumgebung der App unterscheiden kann.
+
+Die App ist nicht über den Google Play Store verfügbar. Die Installation erfolgt manuell über Android Studio:
 
 1. Aktiviere **Entwickleroptionen** auf deinem Android-Gerät.
 2. Aktiviere **USB-Debugging** in den Entwickleroptionen.
