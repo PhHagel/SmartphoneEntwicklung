@@ -8,7 +8,7 @@ Die **PHANDAM-App** ist Teil eines Projekts im Rahmen des Studiengangs Informati
 
 - Aufnahme von Foto- und Audiodateien
 - Weiterleitung der Dateien an einen zentralen Server
-- Sprachgesteuerte Interaktionen mit dem System
+- Sprachgesteuerte Interaktionen
 - Terminvereinbarung durch Sprachaufnahme
 - Erfassung von Neukunden durch Sprachaufnahme
 
@@ -27,6 +27,7 @@ Die **PHANDAM-App** ist Teil eines Projekts im Rahmen des Studiengangs Informati
 ## 🛠️ Installation
 
 Die App ist nicht über den Google Play Store verfügbar. Die Installation erfolgt manuell über Android Studio:
+Vor der Installation sollte geprüft werden, ob die richtige IP-Adresse des Servers in der App konfiguriert ist, da sich diese von der Nutzungsumgebung der App unterscheiden kann.
 
 1. Aktiviere **Entwickleroptionen** auf deinem Android-Gerät.
 2. Aktiviere **USB-Debugging** in den Entwickleroptionen.
