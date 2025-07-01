@@ -33,7 +33,7 @@ public class AudioPlayerHelper {
             player.setDataSource(filePath);
             player.setAudioAttributes(new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                     .build());
 
             player.setOnPreparedListener(MediaPlayer::start);
